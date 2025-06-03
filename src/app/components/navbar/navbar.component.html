@@ -1,0 +1,46 @@
+<nav class="w-full flex items-center justify-between py-6 px-6 md:px-30 bg-white ">
+  <a routerLink="/">
+    <div class="flex items-center gap-2">
+      <img
+        src="/homepage.png"
+        class="w-[40px] h-auto filter"
+        style="filter: brightness(0) saturate(100%) invert(34%) sepia(74%) saturate(4844%) hue-rotate(6deg) brightness(93%) contrast(93%);"
+        loading="lazy"
+        alt=""/>
+      <h3 class="text-2xl font-bold text-[#c04000]">หน้าแรก</h3>
+    </div>
+  </a>
+
+  <!-- Hamburger-->
+  <button class="md:hidden focus:outline-none" (click)="showMenu = !showMenu">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#c04000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+
+  <div class="hidden md:flex items-center gap-8 text-xl font-extralight text-gray-500">
+    <a routerLink="/payment-check" routerLinkActive="text-[#c04000] font-semibold" class="hover:text-[#c04000] transition-colors cursor-pointer px-4 py-2">ตรวจสอบการชำระเงิน</a>
+    <a routerLink="/competitors" routerLinkActive="text-[#c04000] font-semibold" class="hover:text-[#c04000] transition-colors cursor-pointer px-4 py-2">รายชื่อผู้เข้าแข่งขัน</a>
+    <a routerLink="/check-match" routerLinkActive="text-[#c04000] font-semibold" class="hover:text-[#c04000] transition-colors cursor-pointer px-4 py-2">ตรวจสายการแข่งขัน</a>
+    <a routerLink="/detail" routerLinkActive="text-[#c04000] font-semibold" class="hover:text-[#c04000] transition-colors cursor-pointer px-4 py-2">รายละเอียด</a>
+    <a routerLink="/register">
+      <button class="bg-[#c04000] hover:bg-[#a03700] transition-colors text-white px-6 py-4 rounded-2xl">ลงทะเบียน</button>
+    </a>
+  </div>
+</nav>
+
+<div *ngIf="showMenu" class="md:hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-40 transition">
+  <div class="bg-white w-3/4 max-w-xs p-6 h-full shadow-lg flex flex-col gap-6">
+    <div class="flex justify-between items-center mb-4">
+      <span class="text-2xl font-bold text-[#c04000]">เมนู</span>
+      <button (click)="showMenu = false">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <a routerLink="/payment-check" (click)="showMenu = false" routerLinkActive="text-[#c04000] font-semibold" class="py-2 px-2 rounded hover:bg-gray-100">ตรวจสอบการชำระเงิน</a>
+    <a routerLink="/competitors" (click)="showMenu = false" routerLinkActive="text-[#c04000] font-semibold" class="py-2 px-2 rounded hover:bg-gray-100">รายชื่อผู้เข้าแข่งขัน</a>
+    <a routerLink="/check-match" (click)="showMenu = false" routerLinkActive="text-[#c04000] font-semibold" class="py-2 px-2 rounded hover:bg-gray-100">ตรวจสายการแข่งขัน</a>
+    <a routerLink="/detail" (click)="showMenu = false" routerLinkActive="text-[#c04000] font-semibold" class="py-2 px-2 rounded hover:bg-gray-100">รายละเอียด</a>
+    <a routerLink="/register" (click)="showMenu = false" class="mt-4">
+      <button class="w-full bg-[#c04000] hover:bg-[#a03700] transition-colors text-white px-6 py-4 rounded-2xl">ลงทะเบียน</button>
+    </a>
+  </div>
+</div>
