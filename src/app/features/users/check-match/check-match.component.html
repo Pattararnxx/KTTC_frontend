@@ -1,0 +1,40 @@
+<section class="min-h-[calc(100vh-110px)] px-40 py-10">
+  <form [formGroup]="fg" class="flex gap-12">
+    <select formControlName="category"
+            class="max-w-60  bg-[#c04000] border border-[#c04000] text-base sm:text-2xl text-white rounded-lg focus:ring-[#c04000] focus:border-[#c04000] block w-full p-2.5">
+      <option value="" disabled>ประเภทการแข่งขัน</option>
+      @for (category of categories; track category) {
+        <option [value]="category">{{ category }}</option>
+      }
+    </select>
+
+    <select formControlName="group"
+            class="max-w-40 bg-[#c04000] border border-[#c04000] text-base sm:text-2xl text-white rounded-lg focus:ring-[#c04000] focus:border-[#c04000] block w-full p-2.5">
+      <option value="" disabled>สายการแข่ง</option>
+      @for (group of groups; track group) {
+        <option [value]="group">สาย {{ group }}</option>
+      }
+    </select>
+    <div class="flex items-center gap-6">
+      <div class="flex items-center">
+        <input type="radio"
+               id="radio1"
+               formControlName="round"
+               value="group"
+               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+        <label for="radio1" class="ms-2 text-2xl font-normal text-gray-900">รอบแบ่งกลุ่ม</label>
+      </div>
+
+      <div class="flex items-center">
+        <input type="radio"
+               id="radio2"
+               formControlName="round"
+               value="bracket"
+               class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
+        <label for="radio2" class="ms-2 text-2xl font-normal text-gray-900">รอบ 16 คนสุดท้าย</label>
+      </div>
+    </div>
+  </form>
+
+
+</section>

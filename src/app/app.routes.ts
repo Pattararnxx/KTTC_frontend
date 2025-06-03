@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
-import {HomeComponent} from './features/home/home.component';
+import {HomeComponent} from './features/users/home/home.component';
 import {PageNotFoundComponent} from './features/page-not-found/page-not-found.component';
-import {PaymentCheckComponent} from './features/payment-check/payment-check.component';
-import {DetailComponent} from './features/detail/detail.component';
-import {CheckMatchComponent} from './features/check-match/check-match.component';
-import {RegisterComponent} from './features/register/register.component';
-import {CompetitorsComponent} from './features/competitors/competitors.component';
-import {AdminLoginComponent} from './features/admin-login/admin-login.component';
+import {PaymentCheckComponent} from './features/users/payment-check/payment-check.component';
+import {DetailComponent} from './features/users/detail/detail.component';
+import {CheckMatchComponent} from './features/users/check-match/check-match.component';
+import {RegisterComponent} from './features/users/register/register.component';
+import {CompetitorsComponent} from './features/users/competitors/competitors.component';
+import {AdminLoginComponent} from './features/admin/admin-login/admin-login.component';
 
 export const routes: Routes = [
   { path: '',component: HomeComponent},

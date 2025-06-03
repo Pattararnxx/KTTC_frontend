@@ -1,0 +1,78 @@
+<section class="min-h-[calc(100vh-110px)] px-4 sm:px-10 lg:px-44 py-10 sm:py-20 flex flex-col gap-10 sm:gap-20">
+  <h1 class="text-3xl sm:text-4xl lg:text-6xl font-semibold">ลงทะเบียนเข้าร่วมการแข่งขัน</h1>
+
+  <form [formGroup]="fg" (submit)="onsubmit()"
+    class="w-full max-w-5xl">
+    <div class="grid grid-cols-1 md:grid-cols-2 md:gap-40 gap-8 mb-10">
+      <div class="relative z-0 w-full mb-6 md:mb-10 group">
+        <input type="text" name="firstname" id="firstname"
+               class="block py-4 px-3 w-full text-base sm:text-lg lg:text-3xl text-gray-900 bg-transparent border-0 border-b-2 border-gray-400 appearance-none focus:outline-none focus:ring-0 focus:border-[#c04000] peer"
+               placeholder=" " formControlName="firstname" />
+        <label for="firstname"
+               class="peer-focus:font-medium absolute text-base sm:text-lg lg:text-3xl text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:text-[#c04000] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">ชื่อ</label>
+      </div>
+
+      <div class="relative z-0 w-full mb-6 md:mb-10 group">
+        <input type="text" name="lastname" id="lastname"
+               class="block py-4 px-3 w-full text-base sm:text-lg lg:text-3xl text-gray-900 bg-transparent border-0 border-b-2 border-gray-400 appearance-none focus:outline-none focus:ring-0 focus:border-[#c04000] peer"
+               placeholder=" " formControlName="lastname" />
+        <label for="lastname"
+               class="peer-focus:font-medium absolute text-base sm:text-lg lg:text-3xl text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:text-[#c04000] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">นามสกุล</label>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 md:gap-40 gap-8">
+      <div class="relative z-0 w-full mb-6 md:mb-10 group">
+        <input type="text" name="affiliation" id="affiliation"
+               class="block py-4 px-3 w-full text-base sm:text-lg lg:text-3xl text-gray-900 bg-transparent border-0 border-b-2 border-gray-400 appearance-none focus:outline-none focus:ring-0 focus:border-[#c04000] peer"
+               placeholder=" " formControlName="affiliation" />
+        <label for="affiliation"
+               class="peer-focus:font-medium absolute text-base sm:text-lg lg:text-3xl text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:text-[#c04000] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">สังกัด (หากไม่มีให้ใส่ - )</label>
+      </div>
+
+      <div class="relative z-0 w-full mb-6 md:mb-10 group">
+        <input type="text" name="seed_rank" id="seed_rank"
+               class="block py-4 px-3 w-full text-base sm:text-lg lg:text-3xl text-gray-900 bg-transparent border-0 border-b-2 border-gray-400 appearance-none focus:outline-none focus:ring-0 focus:border-[#c04000] peer"
+               placeholder=" " formControlName="seed_rank" />
+        <label for="seed_rank"
+               class="peer-focus:font-medium absolute text-base sm:text-lg lg:text-3xl text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:text-[#c04000] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">อันดับมือวาง (หากไม่มีให้ใส่ - )</label>
+      </div>
+    </div>
+
+    <div class="inline-block w-full sm:w-80 mt-10">
+      <label for="category"
+             class="block mb-2 text-lg sm:text-2xl font-medium text-gray-500 dark:text-white">กรุณาเลือกประเภทการแข่งขัน</label>
+      <select id="category" formControlName="category"
+              class="bg-gray-50 border border-gray-300 text-base sm:text-2xl text-gray-900 rounded-lg focus:ring-[#c04000] focus:border-[#c04000] block w-full p-2.5">
+        <option value="" disabled>ประเภทการแข่งขัน</option>
+        <option value="ชายเดี่ยวทั่วไป">ชายเดี่ยวทั่วไป</option>
+        <option value="หญิงเดี่ยวทั่วไป">หญิงเดี่ยวทั่วไป</option>
+        <option value="ชายเดี่ยวอายุไม่ต่ำกว่า 40 ปี">ชายเดี่ยวอายุไม่ต่ำกว่า 40 ปี</option>
+        <option value="ญิงเดี่ยวอายุไม่ต่ำกว่า 40 ปี">หญิงเดี่ยวอายุไม่ต่ำกว่า 40 ปี</option>
+      </select>
+    </div>
+
+    <h2 class="mt-16 sm:mt-30 mb-6 sm:mb-8 text-2xl sm:text-4xl font-medium">ช่องทางการโอนเงิน</h2>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 sm:gap-10 mb-10">
+      <img src="/qr.png" alt="QR Code" class="w-full sm:w-80 max-w-xs object-contain">
+      <div class="flex flex-col gap-4 sm:gap-8">
+        <h3 class="text-xl sm:text-4xl"><span class="font-medium">ชื่อบัญชี : </span>ดังตัวอย่าง เป็นต้น</h3>
+        <h3 class="text-xl sm:text-4xl"><span class="font-medium">พร้อมเพย์ : </span>061-XXXXXXX</h3>
+        <div class="mt-2 sm:mt-4 inline-block w-full sm:w-50">
+          <label class="block mb-2 text-xl font-medium text-gray-700" for="slip_url">+ แนบสลิป</label>
+          <input
+            (change)="onFileSelected($event)"
+            class="block w-full h-10 text-sm sm:text-lg text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
+            id="slip_url" type="file">
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-20 sm:mt-40 flex justify-end">
+      <button type="submit" [disabled]="fg.invalid"
+              class="text-white bg-[#c04000] hover:bg-[#a03800] focus:ring-4 focus:outline-none focus:ring-[#e07a3a] font-semibold rounded-2xl text-base sm:text-lg lg:text-xl px-6 sm:px-8 py-3 sm:py-4">
+        ส่งข้อมูล
+      </button>
+    </div>
+  </form>
+</section>
