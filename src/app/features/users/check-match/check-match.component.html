@@ -1,7 +1,7 @@
-<section class="min-h-[calc(100vh-110px)] px-40 py-10">
-  <form [formGroup]="fg" class="flex gap-12">
+<section class="min-h-[calc(100vh-110px)] px-4 sm:px-8 lg:px-40 py-10">
+  <form [formGroup]="fg" class="flex flex-col sm:flex-row gap-4 sm:gap-12">
     <select formControlName="category"
-            class="max-w-60  bg-[#c04000] border border-[#c04000] text-base sm:text-2xl text-white rounded-lg focus:ring-[#c04000] focus:border-[#c04000] block w-full p-2.5">
+            class="max-w-full sm:max-w-60 bg-[#c04000] border border-[#c04000] text-base sm:text-2xl text-white rounded-lg focus:ring-[#c04000] focus:border-[#c04000] block w-full p-2.5">
       <option value="" disabled>ประเภทการแข่งขัน</option>
       @for (category of categories; track category) {
         <option [value]="category">{{ category }}</option>
@@ -9,20 +9,21 @@
     </select>
 
     <select formControlName="group"
-            class="max-w-40 bg-[#c04000] border border-[#c04000] text-base sm:text-2xl text-white rounded-lg focus:ring-[#c04000] focus:border-[#c04000] block w-full p-2.5">
+            class="max-w-full sm:max-w-40 bg-[#c04000] border border-[#c04000] text-base sm:text-2xl text-white rounded-lg focus:ring-[#c04000] focus:border-[#c04000] block w-full p-2.5">
       <option value="" disabled>สายการแข่ง</option>
       @for (group of groups; track group) {
         <option [value]="group">สาย {{ group }}</option>
       }
     </select>
-    <div class="flex items-center gap-6">
+
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
       <div class="flex items-center">
         <input type="radio"
                id="radio1"
                formControlName="round"
                value="group"
                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-        <label for="radio1" class="ms-2 text-2xl font-normal text-gray-900">รอบแบ่งกลุ่ม</label>
+        <label for="radio1" class="ms-2 text-lg sm:text-2xl font-normal text-gray-900">รอบแบ่งกลุ่ม</label>
       </div>
 
       <div class="flex items-center">
@@ -31,10 +32,89 @@
                formControlName="round"
                value="bracket"
                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-        <label for="radio2" class="ms-2 text-2xl font-normal text-gray-900">รอบ 16 คนสุดท้าย</label>
+        <label for="radio2" class="ms-2 text-lg sm:text-2xl font-normal text-gray-900">รอบ 16 คนสุดท้าย</label>
       </div>
     </div>
   </form>
 
+  @if (!selectedCategory() || !selectedGroup()) {
+    <div class="max-w-5xl mx-auto mt-20 sm:mt-40 text-center px-4">
+      <div class="text-gray-400 text-5xl sm:text-7xl mb-4">🏓</div>
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-600 mb-2">เลือกประเภทและสายการแข่งขัน</h2>
+      <p class="text-gray-500 text-lg sm:text-xl">กรุณาเลือกประเภทและสายการแข่งขันเพื่อดูตารางผลการแข่งขัน</p>
+    </div>
+  }
+
+  @if (selectedCategory() && selectedGroup() && !hasData()) {
+    <div class="max-w-5xl mx-auto mt-20 sm:mt-40 text-center px-4">
+      <div class="text-orange-400 text-5xl sm:text-7xl mb-4">⚠️</div>
+      <h2 class="text-2xl sm:text-3xl font-bold text-orange-600 mb-2">ไม่มีข้อมูลการแข่งขัน</h2>
+      <p class="text-gray-500 text-lg sm:text-xl">{{ formTitle() }}</p>
+    </div>
+  }
+
+  @if (hasData()) {
+    <div class="max-w-full lg:max-w-8xl mx-auto overflow-hidden">
+      <div class="text-center py-6 sm:py-8 px-4">
+        <h1 class="text-xl sm:text-2xl lg:text-5xl font-bold lg:font-semibold text-gray-800">ตารางแสดงผลการแข่งขัน</h1>
+        <p class="text-gray-600 text-base sm:text-xl mt-2">{{ formTitle() }}</p>
+      </div>
+
+      <!--Desktop-->
+      <div class="hidden lg:block overflow-x-auto px-8 pb-8">
+        <table class="w-full">
+          <thead>
+          <tr class="border-b-2 border-gray-300">
+            <th class="text-left py-4 px-6 text-lg font-bold text-gray-700 min-w-32">ชื่อผู้เล่น</th>
+            @for (player of currentPlayers(); track player.name; let i = $index) {
+              <th class="text-center py-4 px-4 text-lg font-semibold text-gray-700 min-w-24">{{ player.name }}</th>
+            }
+            <th class="text-center py-4 px-6 text-lg font-bold text-gray-700 min-w-20">แต้มรวม</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (player of currentPlayers(); track player.name; let i = $index) {
+              <tr class="border-b border-gray-200 hover:bg-gray-50">
+                <td class="py-8 px-6 text-lg font-medium text-gray-800">{{ player.name }}</td>
+                @for (opponent of currentPlayers(); track opponent.name; let j = $index) {
+                  <td class="text-center py-4 px-4 text-lg" [class]="getCellClass(getMatchResult(i, j))">
+                    {{ getMatchResult(i, j) }}
+                  </td>
+                }
+                <td class="text-center py-4 px-6 text-xl font-bold text-black">{{ player.points }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!--Mobile-->
+      <div class="block lg:hidden p-4">
+        @for (player of currentPlayers(); track player.name; let i = $index) {
+          <div class="border border-gray-200 rounded-lg mb-4 p-4 bg-white shadow-sm">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
+              <h3 class="text-lg font-semibold text-gray-800">{{ player.name }}</h3>
+              <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                {{ player.points }} แต้ม
+              </span>
+            </div>
+
+            <div class="space-y-3">
+              @for (opponent of currentPlayers(); track opponent.name; let j = $index) {
+                @if (i !== j) {
+                  <div class="flex justify-between items-center py-2 px-3 bg-gray-50 rounded">
+                    <span class="text-gray-700 font-medium">vs {{ opponent.name }}</span>
+                    <span class="font-semibold" [class]="getCellClass(getMatchResult(i, j))">
+                      {{ getMatchResult(i, j) }}
+                    </span>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
 
 </section>
