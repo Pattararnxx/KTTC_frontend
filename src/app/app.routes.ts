@@ -7,6 +7,9 @@ import {CheckMatchComponent} from './features/users/check-match/check-match.comp
 import {RegisterComponent} from './features/users/register/register.component';
 import {CompetitorsComponent} from './features/users/competitors/competitors.component';
 import {AdminLoginComponent} from './features/admin/admin-login/admin-login.component';
+import {AdminApproveComponent} from './features/admin/admin-approve/admin-approve.component';
+import {DivideGroupsComponent} from './features/admin/divide-groups/divide-groups.component';
+import {GroupResultsComponent} from './features/admin/group-results/group-results.component';
 
 export const routes: Routes = [
   { path: '',component: HomeComponent},
@@ -16,5 +19,8 @@ export const routes: Routes = [
   { path: 'detail', component: DetailComponent},
   { path: 'register', component: RegisterComponent},
   { path: 'login', component: AdminLoginComponent},
+  { path: 'admin/approve', component: AdminApproveComponent},
+  { path: 'admin/divide-group', component: DivideGroupsComponent},
+  { path: 'admin/group-results', component: GroupResultsComponent},
   { path: '**' ,component: PageNotFoundComponent}
 ];

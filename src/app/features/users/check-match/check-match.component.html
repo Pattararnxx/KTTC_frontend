@@ -1,3 +1,4 @@
+<app-navbar></app-navbar>
 <section class="min-h-[calc(100vh-110px)] px-4 sm:px-8 lg:px-40 py-10">
   <form [formGroup]="fg" class="flex flex-col sm:flex-row gap-4 sm:gap-12">
     <select formControlName="category"
@@ -37,7 +38,7 @@
     </div>
   </form>
 
-  @if (!selectedCategory() || !selectedGroup()) {
+  @if ((!selectedCategory() || !selectedGroup()) && selectedRound() !== 'bracket') {
     <div class="max-w-5xl mx-auto mt-20 sm:mt-40 text-center px-4">
       <div class="text-gray-400 text-5xl sm:text-7xl mb-4">🏓</div>
       <h2 class="text-2xl sm:text-3xl font-bold text-gray-600 mb-2">เลือกประเภทและสายการแข่งขัน</h2>
@@ -53,7 +54,7 @@
     </div>
   }
 
-  @if (hasData()) {
+  @if (hasData()&& selectedRound() == 'group') {
     <div class="max-w-full lg:max-w-8xl mx-auto overflow-hidden">
       <div class="text-center py-6 sm:py-8 px-4">
         <h1 class="text-xl sm:text-2xl lg:text-5xl font-bold lg:font-semibold text-gray-800">ตารางแสดงผลการแข่งขัน</h1>
@@ -66,7 +67,7 @@
           <thead>
           <tr class="border-b-2 border-gray-300">
             <th class="text-left py-4 px-6 text-lg font-bold text-gray-700 min-w-32">ชื่อผู้เล่น</th>
-            @for (player of currentPlayers(); track player.name; let i = $index) {
+            @for (player of currentPlayers(); track player.name; ) {
               <th class="text-center py-4 px-4 text-lg font-semibold text-gray-700 min-w-24">{{ player.name }}</th>
             }
             <th class="text-center py-4 px-6 text-lg font-bold text-gray-700 min-w-20">แต้มรวม</th>
@@ -113,6 +114,52 @@
             </div>
           </div>
         }
+      </div>
+    </div>
+  }
+<!--  Bracket-->
+  @if (hasData() && selectedRound() === 'bracket') {
+    <div class="flex py-12">
+      <div class="bracket bracket-16">
+        <!-- Round 1-->
+        <div class="bracket-column round-16">
+          @for (match of getMatchesByRound(1);; track match.id) {
+            <div class="bracket-match bracket-match--with-line">
+              <div class="bracket-player">{{ match.player1 || '-' }}</div>
+              <div class="bracket-player">{{ match.player2 || '-' }}</div>
+            </div>
+          }
+        </div>
+        <!-- Round 2 -->
+        <div class="bracket-column round-8">
+          @for (match of getMatchesByRound(2);; track match.id) {
+            <div class="bracket-join"></div>
+            <div class="bracket-match bracket-match--with-line ">
+              <div class="bracket-player">{{ match.player1 || '-' }}</div>
+              <div class="bracket-player">{{ match.player2 || '-' }}</div>
+            </div>
+          }
+        </div>
+        <!-- Round 3-->
+        <div class="bracket-column round-4">
+          @for (match of getMatchesByRound(3);; track match.id) {
+            <div class="bracket-join"></div>
+            <div class="bracket-match">
+              <div class="bracket-player">{{ match.player1 || '-' }}</div>
+              <div class="bracket-player">{{ match.player2 || '-' }}</div>
+            </div>
+          }
+        </div>
+        <!-- Final Round-->
+        <div class="bracket-column round-2">
+          @for (match of getMatchesByRound(4);; track match.id) {
+            <div class="bracket-join"></div>
+            <div class="bracket-match">
+              <div class="bracket-player">{{ match.player1 || '-' }}</div>
+              <div class="bracket-player">{{ match.player2 || '-' }}</div>
+            </div>
+          }
+        </div>
       </div>
     </div>
   }

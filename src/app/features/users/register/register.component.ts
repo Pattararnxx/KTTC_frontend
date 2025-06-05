@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {NavbarComponent} from '../../../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-register',
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NavbarComponent
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'

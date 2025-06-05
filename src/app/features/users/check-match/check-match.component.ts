@@ -1,12 +1,15 @@
 import {Component, computed, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {Player} from '../../../shared/models/Player.model';
+import {BracketData, Match} from '../../../shared/models/Bracket.model';
+import {NavbarComponent} from '../../../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-check-match',
-    imports: [
-        ReactiveFormsModule
-    ],
+  imports: [
+    ReactiveFormsModule,
+    NavbarComponent
+  ],
   templateUrl: './check-match.component.html',
   styleUrl: './check-match.component.css'
 })
@@ -14,6 +17,7 @@ export class CheckMatchComponent {
   categories = ['ชายเดี่ยวทั่วไป', 'หญิงเดี่ยวทั่วไป', 'ชายเดี่ยว 40 ปี', 'หญิงเดี่ยว 40 ปี'];
   groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
+  // Group
   mockData = signal<{[key: string]: { players: Player[], results: (string | null)[][] }}>({
     'ชายเดี่ยวทั่วไป-A': {
       players: [
@@ -59,6 +63,42 @@ export class CheckMatchComponent {
     }
   });
 
+  // Bracket
+  mockBracketData = signal<{[key: string]: BracketData}>({
+    'ชายเดี่ยวทั่วไป': {
+      players: [
+        'โครงมัจ', 'สมชาย', 'จิรายุ', 'พงษ์ศักดิ์',
+        'อนุชิต', 'ธีรศักดิ์', 'วิชัย', 'สุรชัย',
+        'ประวิทย์', 'อดิศร', 'กิตติ', 'รัชพล',
+        'สมศักดิ์', 'วิทยา', 'นิรันดร์', 'ชัยวัฒน์'
+      ],
+      matches: [
+        // round 8
+        { id: 'r1-m1', player1: 'โครงมัจ', player2: 'สมชาย', score1: 2, score2: 0, winner: 'โครงมัจ', round: 1 },
+        { id: 'r1-m2', player1: 'จิรายุ', player2: 'พงษ์ศักดิ์', score1: 1, score2: 2, winner: 'พงษ์ศักดิ์', round: 1 },
+        { id: 'r1-m3', player1: 'อนุชิต', player2: 'ธีรศักดิ์', score1: 2, score2: 1, winner: 'อนุชิต', round: 1 },
+        { id: 'r1-m4', player1: 'วิชัย', player2: 'สุรชัย', round: 1 },
+        { id: 'r1-m5', player1: 'ประวิทย์', player2: 'อดิศร', round: 1 },
+        { id: 'r1-m6', player1: 'กิตติ', player2: 'รัชพล', round: 1 },
+        { id: 'r1-m7', player1: 'สมศักดิ์', player2: 'วิทยา', round: 1 },
+        { id: 'r1-m8', player1: 'นิรันดร์', player2: 'ชัยวัฒน์', round: 1 },
+
+        // round 4
+        { id: 'r2-m1', player1: 'โครงมัจ', player2: 'พงษ์ศักดิ์', score1: 2, score2: 1, winner: 'โครงมัจ', round: 2 },
+        { id: 'r2-m2', player1: 'อนุชิต', round: 2 },
+        { id: 'r2-m3', round: 2 },
+        { id: 'r2-m4', round: 2 },
+
+        // round 2
+        { id: 'r3-m1', player1: 'โครงมัจ', round: 3 },
+        { id: 'r3-m2', round: 3 },
+
+        // final
+        { id: 'r4-m1', round: 4 }
+      ]
+    }
+  });
+
   fg = new FormGroup({
     category: new FormControl(''),
     group: new FormControl(''),
@@ -69,6 +109,8 @@ export class CheckMatchComponent {
   selectedGroup = signal<string>('');
   selectedRound = signal<string>('');
 
+
+  // Group
   currentPlayers = computed(() => {
     const key = `${this.selectedCategory()}-${this.selectedGroup()}`;
     const data = this.mockData()[key];
@@ -81,17 +123,36 @@ export class CheckMatchComponent {
     return data?.results || [];
   });
 
+  // Bracket
+  currentBracketData = computed(() => {
+    if (this.selectedRound() !== 'bracket') return null;
+    const key = this.selectedCategory();
+    return this.mockBracketData()[key] || null;
+  })
+
   hasData = computed(() => {
-    return this.currentPlayers().length > 0;
+    if (this.selectedRound() === 'group') {
+      return this.currentPlayers().length > 0;
+    } else {
+      return this.currentBracketData() !== null;
+    }
   });
 
   formTitle = computed(() => {
     const category = this.selectedCategory();
-    const group = this.selectedGroup();
-    if (category && group) {
-      return `${category} - สาย ${group}`;
+    const round = this.selectedRound();
+
+    if (round === 'group') {
+      const group = this.selectedGroup();
+      if (category && group) {
+        return `${category} - สาย ${group}`;
+      }
+    } else if (round === 'bracket') {
+      if (category) {
+        return `${category} - รอบ 16 คนสุดท้าย`;
+      }
     }
-    return 'เลือกประเภทและสายการแข่งขัน';
+    return 'เลือกประเภทและรูปแบบการแข่งขัน';
   });
 
   constructor() {
@@ -136,14 +197,13 @@ export class CheckMatchComponent {
     }
     return '';
   }
-  onFormChange() {
-    console.log('Current selections:', {
-      category: this.selectedCategory(),
-      group: this.selectedGroup(),
-      round: this.selectedRound(),
-      hasData: this.hasData(),
-      playersCount: this.currentPlayers().length
-    });
+
+  // Bracket
+  getMatchesByRound(round: number): Match[] {
+    const bracketData = this.currentBracketData();
+    if (!bracketData) return [];
+    return bracketData.matches.filter(match => match.round === round);
   }
+
 
 }

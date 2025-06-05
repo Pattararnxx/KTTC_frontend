@@ -1,0 +1,41 @@
+<app-sidebar></app-sidebar>
+<section class="max-w-[calc(100vw-350px)] ml-80 px-30 py-10 min-h-screen">
+  <div class="flex justify-center mt-10 mb-15">
+    <button
+      (click)="drawGroups()"
+      class="text-xl bg-[#c04000] hover:bg-[#a03700] text-white font-semibold py-3 px-6 border border-[#c04000] rounded">
+      คลิกเพื่อทำการสุ่มสายการแข่งขัน
+    </button>
+  </div>
+
+  @for(category of groupByCategoryKeys(); track category) {
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold mb-4">{{ category }}</h2>
+
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        @for(group of GROUPS; track group) {
+          <div class="border rounded border-gray-300 p-4">
+            <h3 class="font-semibold mb-2">กลุ่ม {{ group }}</h3>
+            @for(player of groupedResults()[category][group]; track player.id) {
+              <div class="text-lg mb-1">
+                {{ player.firstname }} {{ player.lastname }}
+                <span class="text-gray-500">({{ player.affiliation }})</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      @if(knockoutSeeds()[category] && knockoutSeeds()[category].length > 0) {
+        <div class="pt-4 text-lg">
+          <h3 class="font-semibold mb-2">ผู้เล่นที่มี Rank (เข้ารอบน็อคเอาท์โดยตรง)</h3>
+          @for(player of knockoutSeeds()[category]; track player.id) {
+            <div class="inline-block bg-yellow-100 rounded px-2 py-1 mr-2 mb-2">
+              Rank {{ player.seed_rank }}: {{ player.firstname }} {{ player.lastname }}
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

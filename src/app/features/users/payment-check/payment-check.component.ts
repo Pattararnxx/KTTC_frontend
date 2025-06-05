@@ -2,12 +2,14 @@ import {Component, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Payment} from '../../../shared/models/Payment.model';
 import {NgIf} from '@angular/common';
+import {NavbarComponent} from '../../../components/navbar/navbar.component';
 
 @Component({
   selector: 'app-payment-check',
   imports: [
     ReactiveFormsModule,
-    NgIf
+    NgIf,
+    NavbarComponent
   ],
   templateUrl: './payment-check.component.html',
   styleUrl: './payment-check.component.css'
