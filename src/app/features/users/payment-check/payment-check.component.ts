@@ -1,8 +1,9 @@
-import {Component, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {Payment} from '../../../shared/models/Payment.model';
 import {NgIf} from '@angular/common';
 import {NavbarComponent} from '../../../components/navbar/navbar.component';
+import {PaymentCheckService} from '../../../shared/services/payment-check/payment-check.service';
 
 @Component({
   selector: 'app-payment-check',
@@ -15,17 +16,10 @@ import {NavbarComponent} from '../../../components/navbar/navbar.component';
   styleUrl: './payment-check.component.css'
 })
 export class PaymentCheckComponent {
-
+  private paymentCheckService = inject(PaymentCheckService);
 
   foundUsers = signal<Payment[]>([]);
   statusMessage = signal('');
-
-  allUsers = [
-    { firstname: 'สมชาย', lastname: 'ใจดี', is_paid: true },
-    { firstname: 'สมชาย', lastname: 'แสงทอง', is_paid: false },
-    { firstname: 'สมหญิง', lastname: 'แสงทอง', is_paid: true },
-    { firstname: 'สมชาย', lastname: 'ทองดี', is_paid: false },
-  ];
 
   searchForm = new FormGroup({
     query: new FormControl(''),
@@ -40,23 +34,18 @@ export class PaymentCheckComponent {
       return;
     }
 
-    const filtered = this.allUsers.filter(user => {
-      const fullName = `${user.firstname} ${user.lastname}`.toLowerCase();
-      return (
-        user.firstname.toLowerCase().includes(query) ||
-        user.lastname.toLowerCase().includes(query) ||
-        fullName.includes(query)
-      );
+    this.paymentCheckService.searchUser(query).subscribe({
+      next: (result) => {
+        this.foundUsers.set(result);
+        if (result.length === 0) {
+          this.statusMessage.set('ไม่พบข้อมูลผู้สมัคร');
+        } else {
+          this.statusMessage.set('');
+        }
+      },
+      error: () => {
+        this.statusMessage.set('เกิดข้อผิดพลาดในการค้นหา');
+      }
     });
-
-    this.foundUsers.set(filtered);
-
-    if (filtered.length === 0) {
-      this.statusMessage.set('ไม่พบข้อมูลผู้สมัคร');
-    } else {
-      this.statusMessage.set('');
-    }
-
   }
-
 }

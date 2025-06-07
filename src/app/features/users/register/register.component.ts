@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NavbarComponent} from '../../../components/navbar/navbar.component';
+import {RegisterService} from '../../../shared/services/register/register.service';
 
 @Component({
   selector: 'app-register',
@@ -12,6 +13,8 @@ import {NavbarComponent} from '../../../components/navbar/navbar.component';
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
+  private registerService = inject(RegisterService);
+
   fg = new FormGroup({
     firstname: new FormControl('', Validators.required),
     lastname: new FormControl('', Validators.required),
@@ -36,10 +39,15 @@ export class RegisterComponent {
       formData.append('slip_url', slipFile);
     }
 
-    console.log('ส่งข้อมูลแบบ FormData');
-    for (const pair of formData.entries()) {
-      console.log(pair[0] + ':', pair[1]);
-    }
+    this.registerService.register(formData).subscribe({
+      next: (res) => {
+        alert('ลงทะเบียนสำเร็จ!');
+        this.fg.reset();
+      },
+      error: (err) => {
+        alert('เกิดข้อผิดพลาด: ' + (err.error?.message || err.message));
+      }
+    });
   }
 
   onFileSelected(event: Event) {
