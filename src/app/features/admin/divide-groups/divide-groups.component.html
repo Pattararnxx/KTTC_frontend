@@ -1,42 +1,54 @@
   <app-sidebar></app-sidebar>
   <section class="max-w-[calc(100vw-350px)] ml-80 px-30 py-10 min-h-screen">
-    <div class="flex justify-center gap-10 mt-10 mb-15">
-      <div>
+    <div class="flex flex-wrap justify-center gap-8 mt-8 mb-12">
+      <button
+        *ngIf="!groupsSaved() && !loading()"
+        (click)="drawGroups()"
+        class="group relative text-lg bg-gradient-to-r from-[#c04000] to-[#e04800]
+             hover:from-[#a03700] hover:to-[#c04000] text-white font-semibold
+             py-3 px-7 rounded-md shadow-md
+             hover:shadow-lg transform hover:scale-105 transition-all duration-150
+             border-2 border-[#c04000] hover:border-[#a03700]">
+      <span class="flex items-center gap-2">
+        คลิกเพื่อทำการสุ่มสายการแข่งขัน
+      </span>
+      </button>
+
+      @if (groupByCategoryKeys().length > 0) {
         <button
-          *ngIf="!groupsSaved() && !loading()"
-          (click)="drawGroups()"
-          class="group relative text-xl bg-gradient-to-r from-[#c04000] to-[#e04800] hover:from-[#a03700] hover:to-[#c04000] text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-[#c04000] hover:border-[#a03700]">
+          (click)="saveGroups()"
+          *ngIf="!groupsSaved()"
+          class="group relative text-lg bg-gradient-to-r from-green-500 to-green-600
+               hover:from-green-600 hover:to-green-700 text-white font-semibold
+               py-3 px-6 rounded-md shadow-md hover:shadow-lg transform hover:scale-105
+               transition-all duration-150 border-2 border-green-500 hover:border-green-600
+               disabled:bg-gradient-to-r disabled:from-gray-400 disabled:to-gray-500
+               disabled:border-gray-400 disabled:cursor-not-allowed disabled:transform-none
+               disabled:shadow-sm">
         <span class="flex items-center gap-2">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h4a1 1 0 011 1v2M7 4a3 3 0 00-3 3v1a1 1 0 001 1h3M7 4h10a3 3 0 013 3v1a1 1 0 01-1 1H8M8 9v9a2 2 0 002 2h4a2 2 0 002-2V9" />
-          </svg>
-          คลิกเพื่อทำการสุ่มสายการแข่งขัน
+          {{ saving() ? 'กำลังบันทึก...' : 'บันทึกการแบ่งกลุ่ม' }}
         </span>
         </button>
-      </div>
+      }
+    </div>
 
-        @if (groupByCategoryKeys().length > 0) {
-          <button
-            (click)="saveGroups()"
-            [disabled]="saving()"
-            class="group relative text-xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 border-2 border-green-500 hover:border-green-600 disabled:bg-gradient-to-r disabled:from-gray-400 disabled:to-gray-500 disabled:border-gray-400 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-md">
-          <span class="flex items-center gap-2">
-            @if (saving()) {
-              <svg class="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              กำลังบันทึก...
-            } @else {
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-              </svg>
-              บันทึกการแบ่งกลุ่ม
-            }
-          </span>
-          </button>
-        }
-
+    <div *ngIf="groupsSaved()" class="mb-12">
+      <h3 class="text-2xl font-semibold text-[#c04000] mb-2">สร้างการจับคู่แมตช์</h3>
+      <p class="my-3 text-xl font-normal text-gray-700">จะสร้างการแข่งขันรอบกลุ่ม (Round Robin) และรอบน็อกเอาท์</p>
+      <button
+        (click)="createMatches()"
+        [disabled]="saving()"
+        class="group relative mt-4 text-lg bg-gradient-to-r from-[#c04000] to-[#e04800]
+             hover:from-[#a03700] hover:to-[#c04000] text-white font-semibold
+             py-3 px-8 rounded-md shadow-md hover:shadow-lg transform hover:scale-105
+             transition-all duration-150 border-2 border-[#c04000] hover:border-[#a03700]
+             disabled:bg-gradient-to-r disabled:from-gray-400 disabled:to-gray-500
+             disabled:border-gray-400 disabled:cursor-not-allowed disabled:transform-none
+             disabled:shadow-sm">
+      <span class="flex items-center justify-center gap-2">
+        {{ saving() ? 'กำลังสร้างแมตช์...' : 'สร้างการจับคู่แมตช์' }}
+      </span>
+      </button>
     </div>
 
     @for(category of groupByCategoryKeys(); track category) {

@@ -21,4 +21,7 @@ export class GroupsService {
     return this.http.post(`http://localhost:3000/users/groups/assign`, { assignments });
   }
 
+  createTournamentMatches() {
+    return this.http.post('http://localhost:3000/users/tournament/create-draw', {});
+  }
 }

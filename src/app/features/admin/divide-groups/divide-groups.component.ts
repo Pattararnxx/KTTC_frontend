@@ -171,4 +171,25 @@ export class DivideGroupsComponent {
     return Object.keys(this.groupedResults());
   }
 
+  createMatches() {
+    if (!this.groupsSaved()) {
+      alert('กรุณาบันทึกการแบ่งกลุ่มก่อน');
+      return;
+    }
+
+    if (confirm('ต้องการสร้างการจับคู่แมตช์หรือไม่?')) {
+      this.saving.set(true);
+
+      this.groupsService.createTournamentMatches().subscribe({
+        next: () => {
+          this.saving.set(false);
+          alert('สร้างการจับคู่แมตช์สำเร็จ!');
+        },
+        error: () => {
+          this.saving.set(false);
+          alert('เกิดข้อผิดพลาดในการสร้างการจับคู่แมตช์');
+        }
+      });
+    }
+  }
 }

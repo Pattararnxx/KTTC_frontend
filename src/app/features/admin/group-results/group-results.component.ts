@@ -112,17 +112,14 @@ export class GroupResultsComponent implements OnInit, OnDestroy  {
   }
 
   submit(): void {
-    // สร้างผลลัพธ์โดย map filteredMatches กับ scores ปัจจุบัน
-    // ควรมีการตรวจสอบว่า scores()[i] มีอยู่จริง
     const result = this.filteredMatches().map((match, i) => {
       const scoreEntry = this.scores()[i];
       return {
         match,
-        score: scoreEntry ? scoreEntry : { score1: '', score2: '' } // ให้ค่า default ถ้าไม่มี score
+        score: scoreEntry ? scoreEntry : { score1: '', score2: '' }
       };
     });
     console.log('ผลที่บันทึก:', result);
-    // คุณสามารถส่ง result นี้ไปยัง service หรือ backend ต่อไป
   }
 
 
