@@ -66,19 +66,19 @@
         <table class="w-full">
           <thead>
           <tr class="border-b-2 border-gray-300">
-            <th class="text-left py-4 px-6 text-lg font-bold text-gray-700 min-w-32">ชื่อผู้เล่น</th>
+            <th class="text-left py-6 px-6 text-xl font-bold text-gray-700">ชื่อผู้เล่น</th>
             @for (player of currentPlayers(); track player.name; ) {
-              <th class="text-center py-4 px-4 text-lg font-semibold text-gray-700 min-w-24">{{ player.name }}</th>
+              <th class="text-center py-4 px-4 text-xl font-semibold text-gray-700 min-w-24">{{ player.name }}</th>
             }
-            <th class="text-center py-4 px-6 text-lg font-bold text-gray-700 min-w-20">แต้มรวม</th>
+            <th class="text-center py-4 px-6 text-xl font-bold text-gray-700 min-w-20">แต้มรวม</th>
           </tr>
           </thead>
           <tbody>
             @for (player of currentPlayers(); track player.name; let i = $index) {
               <tr class="border-b border-gray-200 hover:bg-gray-50">
-                <td class="py-8 px-6 text-lg font-medium text-gray-800">{{ player.name }}</td>
+                <td class="py-12 px-6 text-xl font-semibold text-gray-700">{{ player.name }}</td>
                 @for (opponent of currentPlayers(); track opponent.name; let j = $index) {
-                  <td class="text-center py-4 px-4 text-lg" [class]="getCellClass(getMatchResult(i, j))">
+                  <td class="text-center py-4 px-4 text-xl" [class]="getCellClass(getMatchResult(i, j))">
                     {{ getMatchResult(i, j) }}
                   </td>
                 }
@@ -123,7 +123,7 @@
       <div class="bracket bracket-16">
         <!-- Round 1-->
         <div class="bracket-column round-16">
-          @for (match of getMatchesByRound(1);; track match.id) {
+          @for (match of getMatchesByRound('round16');; track match.id) {
             <div class="bracket-match bracket-match--with-line">
               <div class="bracket-player">{{ match.player1 || '-' }}</div>
               <div class="bracket-player">{{ match.player2 || '-' }}</div>
@@ -132,7 +132,7 @@
         </div>
         <!-- Round 2 -->
         <div class="bracket-column round-8">
-          @for (match of getMatchesByRound(2);; track match.id) {
+          @for (match of getMatchesByRound('quarter');; track match.id) {
             <div class="bracket-join"></div>
             <div class="bracket-match bracket-match--with-line ">
               <div class="bracket-player">{{ match.player1 || '-' }}</div>
@@ -142,7 +142,7 @@
         </div>
         <!-- Round 3-->
         <div class="bracket-column round-4">
-          @for (match of getMatchesByRound(3);; track match.id) {
+          @for (match of getMatchesByRound('semi');; track match.id) {
             <div class="bracket-join"></div>
             <div class="bracket-match">
               <div class="bracket-player">{{ match.player1 || '-' }}</div>
@@ -152,7 +152,7 @@
         </div>
         <!-- Final Round-->
         <div class="bracket-column round-2">
-          @for (match of getMatchesByRound(4);; track match.id) {
+          @for (match of getMatchesByRound('final');; track match.id) {
             <div class="bracket-join"></div>
             <div class="bracket-match">
               <div class="bracket-player">{{ match.player1 || '-' }}</div>

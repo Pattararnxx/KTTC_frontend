@@ -36,5 +36,6 @@ export interface MatchModel {
   match_order: number;
   status: string;
   created_at: string;
+  bracket_round?: number;
   tournament?: TournamentModel;
 }

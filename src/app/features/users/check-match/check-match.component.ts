@@ -1,8 +1,22 @@
-import {Component, computed, signal} from '@angular/core';
+import {Component, computed, inject, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {Player} from '../../../shared/models/Player.model';
-import {BracketData, Match} from '../../../shared/models/Bracket.model';
 import {NavbarComponent} from '../../../components/navbar/navbar.component';
+import {MatchService} from '../../../shared/services/match/match.service';
+import {MatchModel} from '../../../shared/models/Match.model';
+type BracketRound = 'group' | 'round16' | 'quarter' | 'semi' | 'final';
+
+const ROUND_ORDER: Record<BracketRound, number> = {
+  group: 0,
+  round16: 1,
+  quarter: 2,
+  semi: 3,
+  final: 4
+};
+
+function isBracketRound(value: any): value is BracketRound {
+  return typeof value === 'string' && (value in ROUND_ORDER);
+}
 
 @Component({
   selector: 'app-check-match',
@@ -13,91 +27,12 @@ import {NavbarComponent} from '../../../components/navbar/navbar.component';
   templateUrl: './check-match.component.html',
   styleUrl: './check-match.component.css'
 })
+
 export class CheckMatchComponent {
   categories = ['ชายเดี่ยวทั่วไป', 'หญิงเดี่ยวทั่วไป', 'ชายเดี่ยว 40 ปี', 'หญิงเดี่ยว 40 ปี'];
   groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
-  // Group
-  mockData = signal<{[key: string]: { players: Player[], results: (string | null)[][] }}>({
-    'ชายเดี่ยวทั่วไป-A': {
-      players: [
-        { name: 'โครงมัจ', points: 6 },
-        { name: 'ดิณนภพ', points: 2 },
-        { name: 'ชานนท์', points: 1 },
-        { name: 'อภิชาติ', points: 3 }
-      ],
-      results: [
-        ['-', '2-0', '2-1', '2-0'],
-        ['0-2', '-', null, '2-1'],
-        ['1-2', null, '-', '0-2'],
-        ['0-2', '1-2', '2-0', '-']
-      ]
-    },
-    'ชายเดี่ยวทั่วไป-B': {
-      players: [
-        { name: 'สมชาย', points: 4 },
-        { name: 'สมศักดิ์', points: 6 },
-        { name: 'สมหมาย', points: 2 },
-        { name: 'สมบัติ', points: 0 }
-      ],
-      results: [
-        ['-', '1-2', '2-0', '2-1'],
-        ['2-1', '-', '2-0', '2-0'],
-        ['0-2', '0-2', '-', null],
-        ['1-2', '0-2', null, '-']
-      ]
-    },
-    'หญิงเดี่ยวทั่วไป-A': {
-      players: [
-        { name: 'สมหญิง', points: 6 },
-        { name: 'มาลี', points: 4 },
-        { name: 'จันทร์', points: 2 },
-        { name: 'ดาว', points: 0 }
-      ],
-      results: [
-        ['-', '2-1', '2-0', '2-0'],
-        ['1-2', '-', '2-0', null],
-        ['0-2', '0-2', '-', '2-1'],
-        ['0-2', null, '1-2', '-']
-      ]
-    }
-  });
-
-  // Bracket
-  mockBracketData = signal<{[key: string]: BracketData}>({
-    'ชายเดี่ยวทั่วไป': {
-      players: [
-        'โครงมัจ', 'สมชาย', 'จิรายุ', 'พงษ์ศักดิ์',
-        'อนุชิต', 'ธีรศักดิ์', 'วิชัย', 'สุรชัย',
-        'ประวิทย์', 'อดิศร', 'กิตติ', 'รัชพล',
-        'สมศักดิ์', 'วิทยา', 'นิรันดร์', 'ชัยวัฒน์'
-      ],
-      matches: [
-        // round 8
-        { id: 'r1-m1', player1: 'โครงมัจ', player2: 'สมชาย', score1: 2, score2: 0, winner: 'โครงมัจ', round: 1 },
-        { id: 'r1-m2', player1: 'จิรายุ', player2: 'พงษ์ศักดิ์', score1: 1, score2: 2, winner: 'พงษ์ศักดิ์', round: 1 },
-        { id: 'r1-m3', player1: 'อนุชิต', player2: 'ธีรศักดิ์', score1: 2, score2: 1, winner: 'อนุชิต', round: 1 },
-        { id: 'r1-m4', player1: 'วิชัย', player2: 'สุรชัย', round: 1 },
-        { id: 'r1-m5', player1: 'ประวิทย์', player2: 'อดิศร', round: 1 },
-        { id: 'r1-m6', player1: 'กิตติ', player2: 'รัชพล', round: 1 },
-        { id: 'r1-m7', player1: 'สมศักดิ์', player2: 'วิทยา', round: 1 },
-        { id: 'r1-m8', player1: 'นิรันดร์', player2: 'ชัยวัฒน์', round: 1 },
-
-        // round 4
-        { id: 'r2-m1', player1: 'โครงมัจ', player2: 'พงษ์ศักดิ์', score1: 2, score2: 1, winner: 'โครงมัจ', round: 2 },
-        { id: 'r2-m2', player1: 'อนุชิต', round: 2 },
-        { id: 'r2-m3', round: 2 },
-        { id: 'r2-m4', round: 2 },
-
-        // round 2
-        { id: 'r3-m1', player1: 'โครงมัจ', round: 3 },
-        { id: 'r3-m2', round: 3 },
-
-        // final
-        { id: 'r4-m1', round: 4 }
-      ]
-    }
-  });
+  private matchService = inject(MatchService);
 
   fg = new FormGroup({
     category: new FormControl(''),
@@ -107,35 +42,187 @@ export class CheckMatchComponent {
 
   selectedCategory = signal<string>('');
   selectedGroup = signal<string>('');
-  selectedRound = signal<string>('');
+  selectedRound = signal<string>('group');
 
+  matches = signal<MatchModel[]>([]);
+  loading = signal<boolean>(false);
+  error = signal<string>('');
 
-  // Group
-  currentPlayers = computed(() => {
-    const key = `${this.selectedCategory()}-${this.selectedGroup()}`;
-    const data = this.mockData()[key];
-    return data?.players || [];
+  constructor() {
+    this.fg.valueChanges.subscribe(values => {
+      console.log('Form values changed:', values);
+
+      this.selectedCategory.set(values.category || '');
+      this.selectedGroup.set(values.group || '');
+      this.selectedRound.set(values.round || 'group');
+
+      if (values.category) {
+        this.loadMatches();
+      }
+    });
+  }
+
+  private loadMatches(): void {
+    const category = this.selectedCategory();
+    const group = this.selectedGroup();
+    const round = this.selectedRound();
+
+    if (!category) {
+      this.matches.set([]);
+      return;
+    }
+
+    if (round === 'group' && !group) {
+      this.matches.set([]);
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set('');
+
+    const filters = {
+      category,
+      round,
+      ...(round === 'group' && { group })
+    };
+
+    this.matchService.getMatches(filters).subscribe({
+      next: (matches) => {
+        console.log('Loaded matches:', matches);
+        this.matches.set(matches);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading matches:', err);
+        this.error.set('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+        this.matches.set([]);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  groupPlayers = computed(() => {
+    const currentMatches = this.matches();
+    const round = this.selectedRound();
+
+    if (round !== 'group' || !currentMatches.length) return [];
+
+    const playersMap = new Map<number, Player>();
+
+    currentMatches.forEach(match => {
+      if (match.player1) {
+        playersMap.set(match.player1.id, {
+          id: match.player1.id,
+          name: `${match.player1.firstname}`,
+          points: 0
+        });
+      }
+      if (match.player2) {
+        playersMap.set(match.player2.id, {
+          id: match.player2.id,
+          name: `${match.player2.firstname}`,
+          points: 0
+        });
+      }
+    });
+
+    currentMatches.forEach(match => {
+      if (match.status === 'completed' && match.winner_id) {
+        const winner = playersMap.get(match.winner_id);
+        if (winner) {
+          winner.points += 2;
+        }
+
+        const loserId = match.winner_id === match.player1_id ? match.player2_id : match.player1_id;
+        const loser = playersMap.get(loserId!);
+
+        if (
+          loser &&
+          ((match.player1_score === 2 && match.player2_score === 1) ||
+            (match.player1_score === 1 && match.player2_score === 2))
+        ) {
+          loser.points += 1;
+        }
+      }
+    });
+
+    return Array.from(playersMap.values()).sort((a, b) => b.points - a.points);
   });
 
-  currentResults = computed(() => {
-    const key = `${this.selectedCategory()}-${this.selectedGroup()}`;
-    const data = this.mockData()[key];
-    return data?.results || [];
+  resultsMatrix = computed(() => {
+    const players = this.groupPlayers();
+    const currentMatches = this.matches();
+
+    if (!players.length) return [];
+
+    const matrix: (string | null)[][] = [];
+
+    players.forEach((player, i) => {
+      matrix[i] = [];
+      players.forEach((opponent, j) => {
+        if (i === j) {
+          matrix[i][j] = '-';
+        } else {
+          const match = currentMatches.find(m =>
+            (m.player1_id === player.id && m.player2_id === opponent.id) ||
+            (m.player1_id === opponent.id && m.player2_id === player.id)
+          );
+
+          if (match && match.status === 'completed') {
+            if (match.player1_id === player.id) {
+              matrix[i][j] = `${match.player1_score || 0}-${match.player2_score || 0}`;
+            } else {
+              matrix[i][j] = `${match.player2_score || 0}-${match.player1_score || 0}`;
+            }
+          } else {
+            matrix[i][j] = null;
+          }
+        }
+      });
+    });
+
+    return matrix;
   });
 
-  // Bracket
-  currentBracketData = computed(() => {
-    if (this.selectedRound() !== 'bracket') return null;
-    const key = this.selectedCategory();
-    return this.mockBracketData()[key] || null;
-  })
+
+  bracketMatches = computed(() => {
+    const currentMatches = this.matches();
+    const selectedRd = this.selectedRound();
+
+    if (selectedRd !== 'bracket') return [];
+
+    return currentMatches
+      .filter(match => match.round && match.round !== 'group')
+      .sort((a, b) => {
+      let aOrder = 999;
+        if (a.round && isBracketRound(a.round)) {
+          aOrder = ROUND_ORDER[a.round as BracketRound];
+        } else if (a.round !== undefined && a.round !== 'group') {
+          console.warn(`Invalid bracket_round value for match ${a.id}: ${a.round}`);
+        }
+      let bOrder = 999;
+        if (b.round && isBracketRound(b.round)) {
+          bOrder = ROUND_ORDER[b.round as BracketRound];
+        } else if (b.round !== undefined && b.round !== 'group') {
+          console.warn(`Invalid bracket_round value for match ${b.id}: ${b.round}`);
+        }
+
+      if (aOrder === bOrder) {
+        return (a.match_order ?? a.id ?? 0) - (b.match_order ?? b.id ?? 0);
+      }
+
+      return aOrder - bOrder;
+    });
+  });
+
+  getMatchesByRound(round: BracketRound): MatchModel[] {
+    const allBracketMatches = this.bracketMatches();
+
+    return allBracketMatches.filter(match => match.round === round);
+  }
 
   hasData = computed(() => {
-    if (this.selectedRound() === 'group') {
-      return this.currentPlayers().length > 0;
-    } else {
-      return this.currentBracketData() !== null;
-    }
+    return this.matches().length > 0;
   });
 
   formTitle = computed(() => {
@@ -155,24 +242,8 @@ export class CheckMatchComponent {
     return 'เลือกประเภทและรูปแบบการแข่งขัน';
   });
 
-  constructor() {
-    this.fg.valueChanges.subscribe(values => {
-      console.log('Form values changed:', values);
-
-      if (values.category) {
-        this.selectedCategory.set(values.category);
-      }
-      if (values.group) {
-        this.selectedGroup.set(values.group);
-      }
-      if (values.round) {
-        this.selectedRound.set(values.round);
-      }
-    });
-  }
-
   getMatchResult(playerIndex: number, opponentIndex: number): string {
-    const results = this.currentResults();
+    const results = this.resultsMatrix();
 
     if (!results || !results[playerIndex]) {
       return '-';
@@ -197,13 +268,11 @@ export class CheckMatchComponent {
     }
     return '';
   }
-
-  // Bracket
-  getMatchesByRound(round: number): Match[] {
-    const bracketData = this.currentBracketData();
-    if (!bracketData) return [];
-    return bracketData.matches.filter(match => match.round === round);
-  }
-
+  currentPlayers = computed(() => {
+    if (this.selectedRound() === 'group') {
+      return this.groupPlayers();
+    }
+    return [];
+  });
 
 }
