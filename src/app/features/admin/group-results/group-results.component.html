@@ -19,68 +19,71 @@
 
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
       <div class="flex items-center">
-        <input type="radio"
-               id="radio1"
-               formControlName="round"
-               value="group"
+        <input type="radio" id="radio1" formControlName="round" value="group"
                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
         <label for="radio1" class="ms-2 text-lg sm:text-2xl font-normal text-gray-900">รอบแบ่งกลุ่ม</label>
       </div>
 
       <div class="flex items-center">
-        <input type="radio"
-               id="radio2"
-               formControlName="round"
-               value="bracket"
+        <input type="radio" id="radio2" formControlName="round" value="bracket"
                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
         <label for="radio2" class="ms-2 text-lg sm:text-2xl font-normal text-gray-900">รอบ 16 คนสุดท้าย</label>
       </div>
     </div>
   </form>
 
-  @if (filteredMatches().length > 0) {
-    <div class="space-y-4 border-2 border-gray-400 py-20 mt-20 rounded-2xl shadow-2xl">
+  @if (matches().length > 0) {
+    <div class="space-y-4 border-2 border-gray-200 py-20 mt-15 rounded-2xl shadow-xl">
       <h1 class="flex justify-center text-5xl font-medium mb-15">ตารางบันทึกผลการแข่งขัน</h1>
-      @for (match of filteredMatches(); track match.team1 + '-' + match.team2 + i; let i = $index) {
+      @for (match of matches(); track match.id; let i = $index) {
         <div class="bg-white p-4 sm:p-5">
           <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-            <div class="text-base sm:text-lg font-medium text-gray-700 w-full sm:w-2/5 text-center sm:text-right truncate" title="{{match.team1}}">{{ match.team1 }}</div>
+            <div class="text-base sm:text-lg font-medium text-gray-700 w-full sm:w-2/5 text-center sm:text-right truncate"
+                 [title]="getPlayerName(match.player1)">
+              {{ getPlayerName(match.player1) }}
+            </div>
+
             <div class="flex items-center gap-2 sm:gap-3">
-              <input type="number"
-                     min="0"
+              <input type="number" min="0"
                      class="w-16 sm:w-20 text-center border border-gray-300 rounded-md py-2 px-1 text-base sm:text-lg focus:ring-2 focus:ring-offset-1 focus:ring-[#c04000] focus:border-[#c04000]"
-                     [value]="scores()[i].score1"
+                     [value]="scores()[i].score1 || ''"
                      (input)="handleScoreInput(i, 'score1', $event)">
               <span class="text-xl sm:text-2xl font-bold text-gray-500">-</span>
-              <input type="number"
-                     min="0"
+              <input type="number" min="0"
                      class="w-16 sm:w-20 text-center border border-gray-300 rounded-md py-2 px-1 text-base sm:text-lg focus:ring-2 focus:ring-offset-1 focus:ring-[#c04000] focus:border-[#c04000]"
-                     [value]="scores()[i].score2"
+                     [value]="scores()[i].score2 || ''"
                      (input)="handleScoreInput(i, 'score2', $event)">
             </div>
-            <div class="text-base sm:text-lg font-medium text-gray-700 w-full sm:w-2/5 text-center sm:text-left truncate" title="{{match.team2}}">{{ match.team2 }}</div>
+
+            <div class="text-base sm:text-lg font-medium text-gray-700 w-full sm:w-2/5 text-center sm:text-left truncate"
+                 [title]="getPlayerName(match.player2)">
+              {{ getPlayerName(match.player2) }}
+            </div>
           </div>
         </div>
       }
     </div>
 
     <div class="mt-8 text-center">
-      <button class="bg-green-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all duration-150"
-              (click)="submit()">
-        บันทึกผล
+      <button
+        class="bg-green-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all duration-150"
+        (click)="submit()"
+        [disabled]="isSubmitting"
+      >
+        {{ isSubmitting ? 'กำลังบันทึก...' : 'บันทึกผล' }}
       </button>
     </div>
 
   } @else {
     <div class="mt-40 text-center p-6 bg-white rounded-lg">
-      <svg class="mx-auto h-36 w-36 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+      <svg class="mx-auto h-36 w-36 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2zm3-7V5a2 2 0 00-2-2H5a2 2 0 00-2 2v2h2z" />
       </svg>
       <h3 class="mt-2 text-4xl font-medium text-gray-700">ไม่พบข้อมูลการแข่งขัน</h3>
       <p class="mt-1 text-2xl text-gray-500">
-        @if (this.round() === 'bracket' && !this.category()) {
+        @if (round() === 'bracket' && !category()) {
           กรุณาเลือกประเภทการแข่งขันเพื่อแสดงผลรอบ Bracket
-        } @else if (this.round() === 'group' && (!this.category() || !this.group())) {
+        } @else if (round() === 'group' && (!category() || !group())) {
           กรุณาเลือกประเภท, สาย และรอบ เพื่อแสดงผลการแข่งขัน
         } @else {
           ไม่พบผลการแข่งขันสำหรับตัวเลือกที่คุณกำหนด
@@ -89,5 +92,3 @@
     </div>
   }
 </section>
-
-
