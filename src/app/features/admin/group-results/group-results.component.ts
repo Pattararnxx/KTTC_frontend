@@ -5,6 +5,10 @@ import {firstValueFrom} from 'rxjs';
 import {MatchService} from '../../../shared/services/match/match.service';
 import {MatchModel} from '../../../shared/models/Match.model';
 
+const BRACKET_ROUNDS_ORDER = ['round16', 'quarter', 'semi', 'final'] as const;
+type BracketRound = typeof BRACKET_ROUNDS_ORDER[number];
+type TournamentRound = 'group' | BracketRound;
+
 @Component({
   selector: 'app-group-results',
   standalone: true,
@@ -31,6 +35,7 @@ export class GroupResultsComponent {
   category = signal('');
   group = signal('');
   round = signal<'group' | 'bracket'>('group');
+  currentManagedRound = signal<TournamentRound>('group');
 
   matches = signal<MatchModel[]>([]);
   scores = signal<{ score1: string; score2: string }[]>([]);
@@ -39,7 +44,12 @@ export class GroupResultsComponent {
     this.fg.valueChanges.subscribe(values => {
       this.category.set(values.category || '');
       this.group.set(values.group || '');
-      this.round.set(values.round === 'bracket' ? 'bracket' : 'group');
+
+      if (values.round === 'bracket') {
+        this.currentManagedRound.set('round16');
+      } else {
+        this.currentManagedRound.set('group');
+      }
     });
     effect(() => {
       this.loadMatches();
@@ -59,30 +69,37 @@ export class GroupResultsComponent {
   private loadMatches(): void {
     const category = this.category();
     const group = this.group();
-    const round = this.round();
+    const roundToLoad = this.currentManagedRound();
 
     if (!category) {
       this.matches.set([]);
       return;
     }
 
-    const filters: any = { category, round };
-    if (round === 'group') {
+    const filters: any = { category };
+    if (roundToLoad === 'group') {
       if (!group) {
         this.matches.set([]);
         return;
       }
       filters.groupName = group;
-    }
-
-    if (round === 'bracket') {
-      filters.round = 'round16';
+      filters.round = 'group';
+    }else {
+      filters.round = roundToLoad;
     }
 
     this.matchService.getMatches(filters).subscribe(matches => {
       console.log('ได้ matches:', matches);
       this.matches.set(matches.filter(m => m.status !== 'completed'));
     });
+  }
+
+  private getNextBracketRound(currentRound: BracketRound): BracketRound | null {
+    const currentIndex = BRACKET_ROUNDS_ORDER.indexOf(currentRound);
+    if (currentIndex !== -1 && currentIndex < BRACKET_ROUNDS_ORDER.length - 1) {
+      return BRACKET_ROUNDS_ORDER[currentIndex + 1];
+    }
+    return null;
   }
 
   handleScoreInput(index: number, key: 'score1' | 'score2', event: Event): void {
@@ -99,7 +116,9 @@ export class GroupResultsComponent {
   async submit(): Promise<void> {
     this.isSubmitting = true;
     const matches = this.matches();
-    let hasUpdated = false;
+    let hasUpdatedAnyMatch = false;
+    const categoryValue = this.category();
+    const currentRoundValue = this.currentManagedRound();
 
     for (let i = 0; i < matches.length; i++) {
       const match = matches[i];
@@ -114,7 +133,7 @@ export class GroupResultsComponent {
         const player1_score = parseInt(score1, 10);
         const player2_score = parseInt(score2, 10);
 
-        if (isNaN(player1_score) || isNaN(player2_score)) continue;
+        if (isNaN(player1_score) || isNaN(player2_score)|| player1_score === player2_score) continue;
 
         const winner_id = player1_score > player2_score ?
           match.player1_id! : match.player2_id!;
@@ -127,33 +146,71 @@ export class GroupResultsComponent {
             status: 'completed'
           })
         );
-        hasUpdated = true;
+        hasUpdatedAnyMatch = true;
       }  catch (error) {
         console.error('Error:', error);
       }
 
     }
-    if (hasUpdated) {
+    if (hasUpdatedAnyMatch) {
       try {
-        const category = this.category();
-        if (category) {
+        if (categoryValue && currentRoundValue === 'group') {
           const bracketResult = await firstValueFrom(
-            this.matchService.generateBracket(category)
+            this.matchService.generateBracket(categoryValue)
           );
 
           if (bracketResult.generated) {
             alert('บันทึกผลสำเร็จ! รอบ Bracket ถูกสร้างอัตโนมัติแล้ว');
+            this.currentManagedRound.set('round16');
           } else {
             alert('บันทึกผลสำเร็จ!');
+            this.loadMatches();
           }
+        }else if (categoryValue && BRACKET_ROUNDS_ORDER.includes(currentRoundValue as BracketRound)) {
+          const allMatchesForCurrentBracketRound = await firstValueFrom(
+            this.matchService.getMatches({ category: categoryValue, round: currentRoundValue })
+          );
+          const allCurrentRoundCompleted = allMatchesForCurrentBracketRound.every(m => m.status === 'completed');
+
+          if (allCurrentRoundCompleted) {
+            const nextRound = this.getNextBracketRound(currentRoundValue as BracketRound);
+            if (nextRound) {
+              alert(`บันทึกผล ${this.currentRoundDisplayName} สำเร็จ! กำลังไปยังรอบ ${this.getRoundDisplayName(nextRound)}`);
+              this.currentManagedRound.set(nextRound);
+            } else {
+              alert(`บันทึกผล ${this.currentRoundDisplayName} สำเร็จ! การแข่งขันสิ้นสุดแล้ว`);
+              this.loadMatches();
+            }
+          } else {
+            alert(`บันทึกผล ${this.currentRoundDisplayName} สำเร็จ!`);
+            this.loadMatches();
+          }
+        } else {
+          alert('บันทึกผลสำเร็จ! (แต่ไม่สามารถระบุขั้นตอนถัดไปได้)');
+          this.loadMatches();
         }
       } catch (error) {
         console.error('Error checking bracket:', error);
         alert('บันทึกผลสำเร็จ!');
+        this.loadMatches();
       }
+    } else {
+      this.loadMatches();
     }
-    this.loadMatches();
     this.isSubmitting = false;
+  }
+
+  get currentRoundDisplayName(): string {
+    return this.getRoundDisplayName(this.currentManagedRound());
+  }
+
+  getRoundDisplayName(round: TournamentRound): string {
+    if (round === 'group') return `กลุ่ม ${this.group() || '(ยังไม่ได้เลือกกลุ่ม)'}`;
+    if (round === 'round16') return 'รอบ 16 คน';
+    if (round === 'quarter') return 'รอบก่อนรองชนะเลิศ (8 คน)';
+    if (round === 'semi') return 'รอบรองชนะเลิศ (4 คน)';
+    if (round === 'final') return 'รอบชิงชนะเลิศ';
+    return 'ไม่ระบุรอบ';
   }
 
   getPlayerName(player: any): string {
