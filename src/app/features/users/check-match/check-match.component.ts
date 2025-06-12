@@ -80,11 +80,16 @@ export class CheckMatchComponent {
     this.loading.set(true);
     this.error.set('');
 
-    const filters = {
-      category,
-      round,
-      ...(round === 'group' && { group })
-    };
+    const filters: any = { category };
+
+    if (round === 'group' && group) {
+      filters.round = 'group';
+      filters.groupName = group;
+    } else if (round === 'bracket') {
+      filters.round = ['round16', 'quarter', 'semi', 'final'];
+    } else {
+      filters.round = round;
+    }
 
     this.matchService.getMatches(filters).subscribe({
       next: (matches) => {

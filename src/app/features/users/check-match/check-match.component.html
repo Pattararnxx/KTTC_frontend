@@ -125,8 +125,8 @@
         <div class="bracket-column round-16">
           @for (match of getMatchesByRound('round16');; track match.id) {
             <div class="bracket-match bracket-match--with-line">
-              <div class="bracket-player">{{ match.player1 || '-' }}</div>
-              <div class="bracket-player">{{ match.player2 || '-' }}</div>
+              <div class="bracket-player">{{ match.player1?.firstname  || '-' }}</div>
+              <div class="bracket-player">{{ match.player2?.firstname || '-' }}</div>
             </div>
           }
         </div>
@@ -135,8 +135,8 @@
           @for (match of getMatchesByRound('quarter');; track match.id) {
             <div class="bracket-join"></div>
             <div class="bracket-match bracket-match--with-line ">
-              <div class="bracket-player">{{ match.player1 || '-' }}</div>
-              <div class="bracket-player">{{ match.player2 || '-' }}</div>
+              <div class="bracket-player">{{ match.player1?.firstname || '-' }}</div>
+              <div class="bracket-player">{{ match.player2?.firstname || '-' }}</div>
             </div>
           }
         </div>
@@ -145,8 +145,8 @@
           @for (match of getMatchesByRound('semi');; track match.id) {
             <div class="bracket-join"></div>
             <div class="bracket-match">
-              <div class="bracket-player">{{ match.player1 || '-' }}</div>
-              <div class="bracket-player">{{ match.player2 || '-' }}</div>
+              <div class="bracket-player">{{ match.player1?.firstname || '-' }}</div>
+              <div class="bracket-player">{{ match.player2?.firstname || '-' }}</div>
             </div>
           }
         </div>
@@ -155,8 +155,8 @@
           @for (match of getMatchesByRound('final');; track match.id) {
             <div class="bracket-join"></div>
             <div class="bracket-match">
-              <div class="bracket-player">{{ match.player1 || '-' }}</div>
-              <div class="bracket-player">{{ match.player2 || '-' }}</div>
+              <div class="bracket-player">{{ match.player1?.firstname || '-' }}</div>
+              <div class="bracket-player">{{ match.player2?.firstname || '-' }}</div>
             </div>
           }
         </div>

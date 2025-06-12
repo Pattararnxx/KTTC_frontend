@@ -17,7 +17,7 @@ import {MatchModel} from '../../../shared/models/Match.model';
   styleUrl: './group-results.component.css'
 })
 export class GroupResultsComponent {
-  categories = ['ชายเดี่ยวทั่วไป', 'หญิงเดี่ยวทั่วไป', 'ชายเดี่ยว 40 ปี', 'หญิงเดี่ยว 40 ปี'];
+  categories = ['ชายเดี่ยวทั่วไป', 'หญิงเดี่ยวทั่วไป', 'ชายเดี่ยวอายุไม่ต่ำกว่า 40 ปี', 'หญิงเดี่ยวอายุไม่ต่ำกว่า 40 ปี'];
   groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   private matchService = inject(MatchService);
   isSubmitting = false;
@@ -61,20 +61,27 @@ export class GroupResultsComponent {
     const group = this.group();
     const round = this.round();
 
-    console.log('Loading matches:', { category, group, round });
-
-    if (!category || !group) {
+    if (!category) {
       this.matches.set([]);
       return;
     }
 
-    this.matchService.getMatches({
-      category,
-      group,
-      round
-    }).subscribe(matches => {
-      const incompleteMatches = matches.filter(m => m.status !== 'completed');
-      this.matches.set(incompleteMatches);
+    const filters: any = { category, round };
+    if (round === 'group') {
+      if (!group) {
+        this.matches.set([]);
+        return;
+      }
+      filters.groupName = group;
+    }
+
+    if (round === 'bracket') {
+      filters.round = 'round16';
+    }
+
+    this.matchService.getMatches(filters).subscribe(matches => {
+      console.log('ได้ matches:', matches);
+      this.matches.set(matches.filter(m => m.status !== 'completed'));
     });
   }
 
@@ -92,6 +99,7 @@ export class GroupResultsComponent {
   async submit(): Promise<void> {
     this.isSubmitting = true;
     const matches = this.matches();
+    let hasUpdated = false;
 
     for (let i = 0; i < matches.length; i++) {
       const match = matches[i];
@@ -119,10 +127,30 @@ export class GroupResultsComponent {
             status: 'completed'
           })
         );
+        hasUpdated = true;
       }  catch (error) {
         console.error('Error:', error);
       }
 
+    }
+    if (hasUpdated) {
+      try {
+        const category = this.category();
+        if (category) {
+          const bracketResult = await firstValueFrom(
+            this.matchService.generateBracket(category)
+          );
+
+          if (bracketResult.generated) {
+            alert('บันทึกผลสำเร็จ! รอบ Bracket ถูกสร้างอัตโนมัติแล้ว');
+          } else {
+            alert('บันทึกผลสำเร็จ!');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking bracket:', error);
+        alert('บันทึกผลสำเร็จ!');
+      }
     }
     this.loadMatches();
     this.isSubmitting = false;

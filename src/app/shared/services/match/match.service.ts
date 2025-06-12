@@ -9,11 +9,20 @@ import {MatchModel} from '../../models/Match.model';
 export class MatchService {
   private http = inject(HttpClient);
 
-  getMatches(filters: { category?: string; group?: string; round?: string }): Observable<MatchModel[]> {
+  getMatches(filters: { category?: string; groupName?: string; round?: string | string[] }): Observable<MatchModel[]> {
     let params = new HttpParams();
     if (filters.category) params = params.set('category', filters.category);
-    if (filters.group) params = params.set('group', filters.group);
-    if (filters.round) params = params.set('round', filters.round);
+    if (filters.groupName) params = params.set('group', filters.groupName);
+
+    if (filters.round) {
+      if (Array.isArray(filters.round)) {
+        filters.round.forEach(r => {
+          params = params.append('round', r);
+        });
+      } else {
+        params = params.set('round', filters.round);
+      }
+    }
 
     return this.http.get<MatchModel[]>('http://localhost:3000/users/matches', { params });
   }
@@ -25,5 +34,9 @@ export class MatchService {
     status: string;
   }) {
     return this.http.patch(`http://localhost:3000/users/matches/${matchId}/score`, data);
+  }
+
+  generateBracket(category: string): Observable<any> {
+    return this.http.post(`http://localhost:3000/users/tournament/${category}/generate-bracket`, {});
   }
 }
