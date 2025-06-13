@@ -1,83 +1,89 @@
   <app-sidebar></app-sidebar>
   <section class="max-w-[calc(100vw-350px)] ml-80 px-30 py-10 min-h-screen">
-    <div class="flex flex-wrap justify-center gap-8 mt-8 mb-12">
-      <button
-        *ngIf="!groupsSaved() && !loading()"
-        (click)="drawGroups()"
-        class="group relative text-lg bg-gradient-to-r from-[#c04000] to-[#e04800]
-             hover:from-[#a03700] hover:to-[#c04000] text-white font-semibold
-             py-3 px-7 rounded-md shadow-md
-             hover:shadow-lg transform hover:scale-105 transition-all duration-150
-             border-2 border-[#c04000] hover:border-[#a03700]">
-      <span class="flex items-center gap-2">
-        คลิกเพื่อทำการสุ่มสายการแข่งขัน
-      </span>
-      </button>
-
-      @if (groupByCategoryKeys().length > 0) {
+    <div *ngIf="loading()" class="flex justify-center items-center min-h-[200px]">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-orange-300 border-t-transparent"></div>
+      <span class="ml-4 text-lg text-orange-500">กำลังโหลดข้อมูล...</span>
+    </div>
+    <div *ngIf="!loading()">
+      <div class="flex flex-wrap justify-center gap-8 mt-8 mb-12">
         <button
-          (click)="saveGroups()"
-          *ngIf="!groupsSaved()"
-          class="group relative text-lg bg-gradient-to-r from-green-500 to-green-600
-               hover:from-green-600 hover:to-green-700 text-white font-semibold
-               py-3 px-6 rounded-md shadow-md hover:shadow-lg transform hover:scale-105
-               transition-all duration-150 border-2 border-green-500 hover:border-green-600
+          *ngIf="!loading() && !groupsSaved()"
+          (click)="drawGroups()"
+          class="group relative text-lg bg-gradient-to-r from-[#c04000] to-[#e04800]
+               hover:from-[#a03700] hover:to-[#c04000] text-white font-semibold
+               py-3 px-7 rounded-md shadow-md
+               hover:shadow-lg transform hover:scale-105 transition-all duration-150
+               border-2 border-[#c04000] hover:border-[#a03700]">
+        <span class="flex items-center gap-2">
+          คลิกเพื่อทำการสุ่มสายการแข่งขัน
+        </span>
+        </button>
+
+        @if (groupByCategoryKeys().length > 0) {
+          <button
+            (click)="saveGroups()"
+            *ngIf="!groupsSaved()"
+            class="group relative text-lg bg-gradient-to-r from-green-500 to-green-600
+                 hover:from-green-600 hover:to-green-700 text-white font-semibold
+                 py-3 px-6 rounded-md shadow-md hover:shadow-lg transform hover:scale-105
+                 transition-all duration-150 border-2 border-green-500 hover:border-green-600
+                 disabled:bg-gradient-to-r disabled:from-gray-400 disabled:to-gray-500
+                 disabled:border-gray-400 disabled:cursor-not-allowed disabled:transform-none
+                 disabled:shadow-sm">
+          <span class="flex items-center gap-2">
+            {{ saving() ? 'กำลังบันทึก...' : 'บันทึกการแบ่งกลุ่ม' }}
+          </span>
+          </button>
+        }
+      </div>
+
+      <div *ngIf="groupsSaved()" class="mb-12">
+        <h3 class="text-2xl font-semibold text-[#c04000] mb-2">สร้างการจับคู่แมตช์</h3>
+        <p class="my-3 text-xl font-normal text-gray-700">จะสร้างการแข่งขันรอบกลุ่ม (Round Robin) และรอบน็อกเอาท์</p>
+        <button
+          (click)="createMatches()"
+          [disabled]="saving()"
+          class="group relative mt-4 text-lg bg-gradient-to-r from-[#c04000] to-[#e04800]
+               hover:from-[#a03700] hover:to-[#c04000] text-white font-semibold
+               py-3 px-8 rounded-md shadow-md hover:shadow-lg transform hover:scale-105
+               transition-all duration-150 border-2 border-[#c04000] hover:border-[#a03700]
                disabled:bg-gradient-to-r disabled:from-gray-400 disabled:to-gray-500
                disabled:border-gray-400 disabled:cursor-not-allowed disabled:transform-none
                disabled:shadow-sm">
-        <span class="flex items-center gap-2">
-          {{ saving() ? 'กำลังบันทึก...' : 'บันทึกการแบ่งกลุ่ม' }}
+        <span class="flex items-center justify-center gap-2">
+          {{ saving() ? 'กำลังสร้างแมตช์...' : 'สร้างการจับคู่แมตช์' }}
         </span>
         </button>
-      }
-    </div>
+      </div>
 
-    <div *ngIf="groupsSaved()" class="mb-12">
-      <h3 class="text-2xl font-semibold text-[#c04000] mb-2">สร้างการจับคู่แมตช์</h3>
-      <p class="my-3 text-xl font-normal text-gray-700">จะสร้างการแข่งขันรอบกลุ่ม (Round Robin) และรอบน็อกเอาท์</p>
-      <button
-        (click)="createMatches()"
-        [disabled]="saving()"
-        class="group relative mt-4 text-lg bg-gradient-to-r from-[#c04000] to-[#e04800]
-             hover:from-[#a03700] hover:to-[#c04000] text-white font-semibold
-             py-3 px-8 rounded-md shadow-md hover:shadow-lg transform hover:scale-105
-             transition-all duration-150 border-2 border-[#c04000] hover:border-[#a03700]
-             disabled:bg-gradient-to-r disabled:from-gray-400 disabled:to-gray-500
-             disabled:border-gray-400 disabled:cursor-not-allowed disabled:transform-none
-             disabled:shadow-sm">
-      <span class="flex items-center justify-center gap-2">
-        {{ saving() ? 'กำลังสร้างแมตช์...' : 'สร้างการจับคู่แมตช์' }}
-      </span>
-      </button>
-    </div>
+      @for(category of groupByCategoryKeys(); track category) {
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold mb-4">{{ category }}</h2>
 
-    @for(category of groupByCategoryKeys(); track category) {
-      <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-4">{{ category }}</h2>
+          <div class="grid grid-cols-4 gap-4 mb-6">
+            @for(group of GROUPS; track group) {
+              <div class="border rounded border-gray-300 p-4">
+                <h3 class="font-semibold mb-2">กลุ่ม {{ group }}</h3>
+                @for(player of groupedResults()[category][group]; track player.id) {
+                  <div class="text-xl mb-3">
+                    {{ player.firstname }} {{ player.lastname }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
 
-        <div class="grid grid-cols-4 gap-4 mb-6">
-          @for(group of GROUPS; track group) {
-            <div class="border rounded border-gray-300 p-4">
-              <h3 class="font-semibold mb-2">กลุ่ม {{ group }}</h3>
-              @for(player of groupedResults()[category][group]; track player.id) {
-                <div class="text-xl mb-3">
-                  {{ player.firstname }} {{ player.lastname }}
+          @if(knockoutSeeds()[category] && knockoutSeeds()[category].length > 0) {
+            <div class="pt-4 text-lg">
+              <h3 class="font-semibold mb-2">ผู้เล่นที่มี Rank (เข้ารอบน็อคเอาท์โดยตรง)</h3>
+              @for(player of knockoutSeeds()[category]; track player.id) {
+                <div class="inline-block bg-yellow-100 rounded px-2 py-1 mr-2 mb-2">
+                  Rank {{ player.seed_rank }}: {{ player.firstname }} {{ player.lastname }}
                 </div>
               }
             </div>
           }
         </div>
-
-        @if(knockoutSeeds()[category] && knockoutSeeds()[category].length > 0) {
-          <div class="pt-4 text-lg">
-            <h3 class="font-semibold mb-2">ผู้เล่นที่มี Rank (เข้ารอบน็อคเอาท์โดยตรง)</h3>
-            @for(player of knockoutSeeds()[category]; track player.id) {
-              <div class="inline-block bg-yellow-100 rounded px-2 py-1 mr-2 mb-2">
-                Rank {{ player.seed_rank }}: {{ player.firstname }} {{ player.lastname }}
-              </div>
-            }
-          </div>
-        }
-      </div>
-    }
+      }
+    </div>
   </section>

@@ -20,6 +20,7 @@ export class PaymentCheckComponent {
 
   foundUsers = signal<Payment[]>([]);
   statusMessage = signal('');
+  isLoading = signal(false);
 
   searchForm = new FormGroup({
     query: new FormControl(''),
@@ -33,6 +34,7 @@ export class PaymentCheckComponent {
       this.foundUsers.set([]);
       return;
     }
+    this.isLoading.set(true);
 
     this.paymentCheckService.searchUser(query).subscribe({
       next: (result) => {
@@ -45,6 +47,9 @@ export class PaymentCheckComponent {
       },
       error: () => {
         this.statusMessage.set('เกิดข้อผิดพลาดในการค้นหา');
+      },
+      complete: () => {
+        this.isLoading.set(false);
       }
     });
   }

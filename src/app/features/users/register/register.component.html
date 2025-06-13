@@ -70,9 +70,10 @@
     </div>
 
     <div class="mt-20 sm:mt-40 flex justify-end">
-      <button type="submit" [disabled]="fg.invalid"
+      <button type="submit"
+              [disabled]="fg.invalid || isSubmitting"
               class="text-white bg-[#c04000] hover:bg-[#a03800] focus:ring-4 focus:outline-none focus:ring-[#e07a3a] font-semibold rounded-2xl text-base sm:text-lg lg:text-xl px-6 sm:px-8 py-3 sm:py-4">
-        ส่งข้อมูล
+        {{ isSubmitting ? 'กำลังบันทึก...' : 'ส่งข้อมูล' }}
       </button>
     </div>
   </form>

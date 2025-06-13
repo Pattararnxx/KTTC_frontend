@@ -10,6 +10,7 @@ import {AdminLoginComponent} from './features/admin/admin-login/admin-login.comp
 import {AdminApproveComponent} from './features/admin/admin-approve/admin-approve.component';
 import {DivideGroupsComponent} from './features/admin/divide-groups/divide-groups.component';
 import {GroupResultsComponent} from './features/admin/group-results/group-results.component';
+import {authGuard} from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '',component: HomeComponent},
@@ -19,8 +20,8 @@ export const routes: Routes = [
   { path: 'detail', component: DetailComponent},
   { path: 'register', component: RegisterComponent},
   { path: 'login', component: AdminLoginComponent},
-  { path: 'admin/approve', component: AdminApproveComponent},
-  { path: 'admin/divide-group', component: DivideGroupsComponent},
-  { path: 'admin/group-results', component: GroupResultsComponent},
+  { path: 'admin/approve', component: AdminApproveComponent, canActivate: [authGuard]},
+  { path: 'admin/divide-group', component: DivideGroupsComponent, canActivate: [authGuard]},
+  { path: 'admin/group-results', component: GroupResultsComponent, canActivate: [authGuard]},
   { path: '**' ,component: PageNotFoundComponent}
 ];

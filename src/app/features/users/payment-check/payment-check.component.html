@@ -13,9 +13,12 @@
           </svg>
         </div>
         <input type="search" id="search" formControlName="query" class="block w-full p-3 sm:p-5 ps-8 sm:ps-10 sm:text-base md:text-xl text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-[#e07a3a] focus:border-[#e07a3a]" placeholder="กรอกชื่อ หรือ นามสกุล" required />
-        <button type="submit" class="text-white absolute end-1.5 sm:end-2.5 bottom-2 sm:bottom-3 bg-[#c04000] hover:bg-[#a03800] focus:ring-4 focus:outline-none focus:ring-[#e07a3a] font-medium rounded-lg text-sm sm:text-lg px-2 sm:px-4 py-1.5 sm:py-2">คลิกเพื่อค้นหา</button>
+        <button [disabled]="isLoading()" type="submit" class="text-white absolute end-1.5 sm:end-2.5 bottom-2 sm:bottom-3 bg-[#c04000] hover:bg-[#a03800] focus:ring-4 focus:outline-none focus:ring-[#e07a3a] font-medium rounded-lg text-sm sm:text-lg px-2 sm:px-4 py-1.5 sm:py-2">คลิกเพื่อค้นหา</button>
       </div>
     </form>
+    <div class="flex justify-center mt-20" *ngIf="isLoading()">
+      <div class="animate-spin rounded-full h-10 w-10 border-4 border-orange-300 border-t-transparent"></div>
+    </div>
     <div *ngIf="foundUsers().length > 0">
       @for (user of foundUsers(); track user.firstname + user.lastname) {
         <div class="flex flex-col gap-3 px-4 py-6 border-2 w-full max-w-sm sm:max-w-2xl lg:max-w-3xl mt-6 sm:mt-15 mx-auto rounded-2xl sm:gap-4 sm:px-10 sm:py-15">

@@ -14,6 +14,7 @@ import {RegisterService} from '../../../shared/services/register/register.servic
 })
 export class RegisterComponent {
   private registerService = inject(RegisterService);
+  isSubmitting = false
 
   fg = new FormGroup({
     firstname: new FormControl('', Validators.required),
@@ -28,6 +29,8 @@ export class RegisterComponent {
       this.fg.markAllAsTouched();
       return;
     }
+    this.isSubmitting = true;
+
     const formData = new FormData();
     formData.append('firstname', this.fg.value.firstname || '');
     formData.append('lastname', this.fg.value.lastname || '');
@@ -43,9 +46,11 @@ export class RegisterComponent {
       next: (res) => {
         alert('ลงทะเบียนสำเร็จ!');
         this.fg.reset();
+        this.isSubmitting = false;
       },
       error: (err) => {
         alert('เกิดข้อผิดพลาด: ' + (err.error?.message || err.message));
+        this.isSubmitting = false;
       }
     });
   }

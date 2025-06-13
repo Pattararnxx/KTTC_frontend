@@ -4,6 +4,7 @@ import {Player} from '../../../shared/models/Player.model';
 import {NavbarComponent} from '../../../components/navbar/navbar.component';
 import {MatchService} from '../../../shared/services/match/match.service';
 import {MatchModel} from '../../../shared/models/Match.model';
+import {NgIf} from '@angular/common';
 type BracketRound = 'group' | 'round16' | 'quarter' | 'semi' | 'final';
 
 const ROUND_ORDER: Record<BracketRound, number> = {
@@ -22,14 +23,15 @@ function isBracketRound(value: any): value is BracketRound {
   selector: 'app-check-match',
   imports: [
     ReactiveFormsModule,
-    NavbarComponent
+    NavbarComponent,
+    NgIf
   ],
   templateUrl: './check-match.component.html',
   styleUrl: './check-match.component.css'
 })
 
 export class CheckMatchComponent {
-  categories = ['ชายเดี่ยวทั่วไป', 'หญิงเดี่ยวทั่วไป', 'ชายเดี่ยว 40 ปี', 'หญิงเดี่ยว 40 ปี'];
+  categories = ['ชายเดี่ยวทั่วไป', 'หญิงเดี่ยวทั่วไป', 'ชายเดี่ยวอายุไม่ต่ำกว่า 40 ปี', 'หญิงเดี่ยวอายุไม่ต่ำกว่า 40 ปี'];
   groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
   private matchService = inject(MatchService);
@@ -278,6 +280,22 @@ export class CheckMatchComponent {
       return this.groupPlayers();
     }
     return [];
+  });
+  tournamentWinner = computed(() => {
+    const finalMatches = this.getMatchesByRound('final');
+
+    if (finalMatches.length === 1) {
+      const finalMatch = finalMatches[0];
+      if (finalMatch.status === 'completed' && finalMatch.winner_id) {
+        if (finalMatch.player1 && finalMatch.player1.id === finalMatch.winner_id) {
+          return finalMatch.player1;
+        }
+        if (finalMatch.player2 && finalMatch.player2.id === finalMatch.winner_id) {
+          return finalMatch.player2;
+        }
+      }
+    }
+    return null;
   });
 
 }

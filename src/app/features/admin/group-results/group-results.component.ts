@@ -4,6 +4,7 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
 import {firstValueFrom} from 'rxjs';
 import {MatchService} from '../../../shared/services/match/match.service';
 import {MatchModel} from '../../../shared/models/Match.model';
+import {NgIf} from '@angular/common';
 
 const BRACKET_ROUNDS_ORDER = ['round16', 'quarter', 'semi', 'final'] as const;
 type BracketRound = typeof BRACKET_ROUNDS_ORDER[number];
@@ -15,7 +16,8 @@ type TournamentRound = 'group' | BracketRound;
   imports: [
     SidebarComponent,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgIf
   ],
   templateUrl: './group-results.component.html',
   styleUrl: './group-results.component.css'
@@ -24,7 +26,8 @@ export class GroupResultsComponent {
   categories = ['ชายเดี่ยวทั่วไป', 'หญิงเดี่ยวทั่วไป', 'ชายเดี่ยวอายุไม่ต่ำกว่า 40 ปี', 'หญิงเดี่ยวอายุไม่ต่ำกว่า 40 ปี'];
   groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   private matchService = inject(MatchService);
-  isSubmitting = false;
+  loading = signal(false)
+  isSubmitting = signal(false);
 
   fg = new FormGroup({
     category: new FormControl(''),
@@ -52,7 +55,16 @@ export class GroupResultsComponent {
       }
     });
     effect(() => {
-      this.loadMatches();
+      const category = this.category();
+      const group = this.group();
+      const round = this.currentManagedRound();
+
+      if (category && ((round === 'group' && group) || round !== 'group')) {
+        this.loadMatches();
+      } else {
+        this.matches.set([]);
+        this.loading.set(false);
+      }
     });
 
     effect(() => {
@@ -63,7 +75,6 @@ export class GroupResultsComponent {
       })));
     });
 
-    this.loadMatches();
   }
 
   private loadMatches(): void {
@@ -73,24 +84,37 @@ export class GroupResultsComponent {
 
     if (!category) {
       this.matches.set([]);
+      this.loading.set(false);
       return;
     }
 
+    if (roundToLoad === 'group' && !group) {
+      this.matches.set([]);
+      this.loading.set(false);
+      return;
+    }
+
+    this.loading = signal(true);
+
     const filters: any = { category };
     if (roundToLoad === 'group') {
-      if (!group) {
-        this.matches.set([]);
-        return;
-      }
       filters.groupName = group;
       filters.round = 'group';
-    }else {
+    } else {
       filters.round = roundToLoad;
     }
 
-    this.matchService.getMatches(filters).subscribe(matches => {
-      console.log('ได้ matches:', matches);
-      this.matches.set(matches.filter(m => m.status !== 'completed'));
+    this.matchService.getMatches(filters).subscribe({
+      next: (matches) => {
+        console.log('ได้ matches:', matches);
+        this.matches.set(matches.filter(m => m.status !== 'completed'));
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading matches:', error);
+        this.matches.set([]);
+        this.loading.set(false);
+      }
     });
   }
 
@@ -114,7 +138,7 @@ export class GroupResultsComponent {
   }
 
   async submit(): Promise<void> {
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
     const matches = this.matches();
     let hasUpdatedAnyMatch = false;
     const categoryValue = this.category();
@@ -197,7 +221,7 @@ export class GroupResultsComponent {
     } else {
       this.loadMatches();
     }
-    this.isSubmitting = false;
+    this.isSubmitting.set(false);
   }
 
   get currentRoundDisplayName(): string {
