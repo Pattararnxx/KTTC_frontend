@@ -12,7 +12,7 @@ export class AuthService {
   #router = inject(Router);
 
   login(username:string, password:string) {
-    return this.#http.post<Admin>('https://dummyjson.com/auth/login',{
+    return this.#http.post<Admin>('http://localhost:3000/auth/login',{
       username,
       password,
       expiresInMins: 60

@@ -3,11 +3,15 @@ import {provideRouter, withComponentInputBinding} from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import {provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {provideHttpClient, withFetch, withInterceptorsFromDi} from '@angular/common/http';
 import {JwtModule} from '@auth0/angular-jwt';
 
 export function tokenGetter() {
-  return localStorage.getItem("access_token");
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem("access_token");
+  }
+  return null;
+
 }
 
 export const appConfig: ApplicationConfig = {
@@ -19,13 +23,14 @@ export const appConfig: ApplicationConfig = {
       JwtModule.forRoot({
         config: {
           tokenGetter: tokenGetter,
-          allowedDomains: ["dummyjson.com"],
-          disallowedRoutes: ["https://dummyjson.com/auth/login"],
+          allowedDomains: ["localhost:3000"],
+          disallowedRoutes: ["http://localhost:3000/auth/login"],
         },
       }),
     ),
     provideHttpClient(
-      withInterceptorsFromDi()
+      withInterceptorsFromDi(),
+      withFetch()
     )
   ]
 };

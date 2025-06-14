@@ -7,9 +7,11 @@
   </div>
 
   <div class="mt-8 sm:mt-10 w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto">
-    <form [formGroup]="fg" class="space-y-6 sm:space-y-8 lg:space-y-10">
+
+    <form [formGroup]="fg" (ngSubmit)="onSubmit()" class="space-y-6 sm:space-y-8 lg:space-y-10">
+
       <div>
-        <label for="user" class="block text-sm sm:text-md font-medium text-gray-900">
+        <label for="user" class="block text-sm sm:text-md font-normal text-gray-900">
           Username
         </label>
         <div class="mt-2">
@@ -19,12 +21,20 @@
             id="user"
             autocomplete="off"
             formControlName="username"
-            class="block w-full rounded-md bg-white px-3 py-2 sm:px-4 sm:py-3 lg:px-5 lg:py-3 text-sm sm:text-base lg:text-xl text-gray-900 border border-gray-300 focus:border-gray-600 focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50 outline-none transition-colors">
+            [class]="'block w-full rounded-md bg-white px-3 py-2 sm:px-4 sm:py-3 lg:px-5 lg:py-3 text-sm sm:text-base lg:text-xl text-gray-900 border outline-none transition-colors ' +
+            (fg.get('username')?.invalid && fg.get('username')?.touched ?
+            'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50' :
+            'border-gray-300 focus:border-gray-600 focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50')"
+            placeholder="Enter your username">
+        </div>
+        <div *ngIf="fg.get('username')?.invalid && fg.get('username')?.touched"
+             class="mt-2 text-sm text-red-600">
+          กรุณากรอกชื่อผู้ใช้
         </div>
       </div>
 
       <div>
-        <label for="password" class="block text-sm sm:text-md font-medium text-gray-900">
+        <label for="password" class="block text-sm sm:text-md font-normal text-gray-900">
           Password
         </label>
         <div class="mt-2">
@@ -34,22 +44,46 @@
             id="password"
             autocomplete="current-password"
             formControlName="password"
-            class="block w-full rounded-md bg-white px-3 py-2 sm:px-4 sm:py-3 lg:px-5 lg:py-3 text-sm sm:text-base lg:text-xl text-gray-900 border border-gray-300 focus:border-gray-600 focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50 outline-none transition-colors">
+            [class]="'block w-full rounded-md bg-white px-3 py-2 sm:px-4 sm:py-3 lg:px-5 lg:py-3 text-sm sm:text-base lg:text-xl text-gray-900 border outline-none transition-colors ' +
+            (fg.get('password')?.invalid && fg.get('password')?.touched ?
+            'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50' :
+            'border-gray-300 focus:border-gray-600 focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50')"
+            placeholder="Enter your password">
         </div>
+        <div *ngIf="fg.get('password')?.invalid && fg.get('password')?.touched"
+             class="mt-2 text-sm text-red-600">
+          กรุณากรอกรหัสผ่าน
+        </div>
+      </div>
+
+      <div *ngIf="showError" class="text-center text-sm text-red-600 font-medium">
+        {{ errorMessage }}
       </div>
 
       <div>
         <button
-          type="button"
-          (click)="onSubmit()"
-          class="flex w-full justify-center rounded-md bg-[#c04000] px-4 py-2 sm:px-5 sm:py-3 text-sm sm:text-lg lg:text-xl font-semibold text-white shadow-sm hover:bg-[#e07a3a] focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#c04000] transition-colors">
-          Sign in
+          type="submit"
+          [disabled]="isLoading"
+          [class]="'flex w-full justify-center rounded-md px-4 py-2 sm:px-5 sm:py-3 text-sm sm:text-lg lg:text-xl font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-offset-2 transition-colors ' +
+          (isLoading ?
+          'bg-gray-400 cursor-not-allowed' :
+          'bg-[#c04000] hover:bg-[#e07a3a] focus-visible:outline-[#c04000]')">
+
+          <span *ngIf="isLoading" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Signing in...
+          </span>
+
+          <span *ngIf="!isLoading">Sign in</span>
         </button>
       </div>
     </form>
 
     <p class="mt-8 sm:mt-10 text-center text-xs sm:text-sm text-gray-500">
-        Using admin system?
+      Using admin system?
       <a href="#" class="font-semibold text-[#c04000] hover:text-[#e07a3a] ml-1">
         Try a desktop!
       </a>
