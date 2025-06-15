@@ -5,7 +5,6 @@ import {PaymentCheckComponent} from './features/users/payment-check/payment-chec
 import {DetailComponent} from './features/users/detail/detail.component';
 import {CheckMatchComponent} from './features/users/check-match/check-match.component';
 import {RegisterComponent} from './features/users/register/register.component';
-import {CompetitorsComponent} from './features/users/competitors/competitors.component';
 import {AdminLoginComponent} from './features/admin/admin-login/admin-login.component';
 import {AdminApproveComponent} from './features/admin/admin-approve/admin-approve.component';
 import {DivideGroupsComponent} from './features/admin/divide-groups/divide-groups.component';
@@ -15,7 +14,6 @@ import {authGuard} from './core/guards/auth.guard';
 export const routes: Routes = [
   { path: '',component: HomeComponent},
   { path: 'payment-check', component: PaymentCheckComponent},
-  { path: 'competitors', component: CompetitorsComponent},
   { path: 'check-match', component: CheckMatchComponent},
   { path: 'detail', component: DetailComponent},
   { path: 'register', component: RegisterComponent},
