@@ -121,51 +121,64 @@
       </div>
     </div>
   }
-<!--  Bracket-->
+  <!--  Bracket-->
   @if (hasData() && selectedRound() === 'bracket'  && !loading()) {
     <div class="flex py-12">
       <div class="bracket bracket-16">
-        <!-- Round 1-->
+        <!-- Round 1 (16 matches) -->
         <div class="bracket-column round-16">
-          @for (match of getMatchesByRound('round16');; track match.id) {
-            <div class="bracket-match bracket-match--with-line">
+          @for (match of getMatchesByRound('round16'); track match.id) {
+            <div class="bracket-match">
               <div class="bracket-player">{{ match.player1?.firstname  || '-' }}</div>
               <div class="bracket-player">{{ match.player2?.firstname || '-' }}</div>
             </div>
           }
         </div>
-        <!-- Round 2 -->
+
+        <!-- Round 2 (8 matches) -->
         <div class="bracket-column round-8">
-          @for (match of getMatchesByRound('quarter');; track match.id) {
-            <div class="bracket-join"></div>
-            <div class="bracket-match bracket-match--with-line ">
+          @for (match of getMatchesByRound('quarter'); track match.id) {
+            <div class="bracket-match">
               <div class="bracket-player">{{ match.player1?.firstname || '-' }}</div>
               <div class="bracket-player">{{ match.player2?.firstname || '-' }}</div>
             </div>
           }
         </div>
-        <!-- Round 3-->
+
+        <!-- Round 3 (4 matches) -->
         <div class="bracket-column round-4">
-          @for (match of getMatchesByRound('semi');; track match.id) {
-            <div class="bracket-join"></div>
+          @for (match of getMatchesByRound('semi'); track match.id) {
             <div class="bracket-match">
               <div class="bracket-player">{{ match.player1?.firstname || '-' }}</div>
               <div class="bracket-player">{{ match.player2?.firstname || '-' }}</div>
             </div>
           }
         </div>
-        <!-- Final Round-->
+
+        <!-- Final Round (2 matches) -->
         <div class="bracket-column round-2">
-          @for (match of getMatchesByRound('final');; track match.id) {
-            <div class="bracket-join"></div>
+          @for (match of getMatchesByRound('final'); track match.id) {
             <div class="bracket-match">
-              <div class="bracket-player">{{ match.player1?.firstname || '-' }}</div>
-              <div class="bracket-player">{{ match.player2?.firstname || '-' }}</div>
+              <div class="bracket-player relative">
+                {{ match.player1?.firstname || '-' }}
+                <span
+                  *ngIf="tournamentWinner() && match.player1?.id === tournamentWinner()?.id"
+                  class="ml-2 text-2xl"
+                >🏆</span>
+              </div>
+              <div class="bracket-player relative">
+                {{ match.player2?.firstname || '-' }}
+                <span
+                  *ngIf="tournamentWinner() && match.player2?.id === tournamentWinner()?.id"
+                  class="ml-2 text-2xl"
+                >🏆</span>
+              </div>
             </div>
           }
         </div>
       </div>
     </div>
+
     @if (tournamentWinner(); as winner) {
       <div class="mt-12 text-center p-6 bg-yellow-100 border-2 border-yellow-400 rounded-lg shadow-lg">
         <h2 class="text-3xl sm:text-4xl font-bold text-yellow-700 mb-2">🏆 ผู้ชนะเลิศการแข่งขัน 🏆</h2>
